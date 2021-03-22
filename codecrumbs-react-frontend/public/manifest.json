@@ -9,11 +9,6 @@
     "default_popup": "index.html",
     "default_title": "Open the popup"
   },
-  "icons": {
-    "16": "logo-small.png",
-    "48": "logo-small.png",
-    "128": "logo-small.png"
-  },
   "content_security_policy": "script-src 'self' 'sha256-GgRxr...'; object-src 'self'",  "permissions": [
   ]
 }
