@@ -1,2 +1,7 @@
 runtime: java11
 instance_class: F1
+env_variables:
+  GITHUB_APP_CLIENT_ID: "5cbd2092c6c5dda327c2"
+  GITHUB_APP_CLIENT_SECRET: "a0f7e51308ecea6079ae4f23151beeeecd6c6da7"
+  GITHUB_APP_AUTH_LINK: "https://github.com/login/oauth/authorize"
+  GITHUB_APP_AUTH_SCOPE: "scope=repo"
