@@ -20,15 +20,17 @@ public class ProjectRepository {
         try {
             DocumentReference documentReference = firebaseService.getDb()
                     .collection(Utils.USERS)
+                    .document(project.getAssociatedUserId())
+                    .collection(Utils.PROJECTS)
                     .document();
-            String userId = documentReference.getId();
+            String projectId = documentReference.getId();
 
-            user.setUserId(userId);
-            documentReference.set(user, SetOptions.merge());
+            project.setProjectId(projectId);
+            documentReference.set(project, SetOptions.merge());
         }
         catch (NullPointerException e) {
-            return new User();
+            return new Project();
         }
-        return user;
+        return project;
     }
 }
