@@ -30,21 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-public class TestController {
-
-    @Autowired
-    UserRepository userRepository;
-    
-    @GetMapping("/test")
-    public String returnTrue() {
-        return "NICE";
-    }
-
-    @PostMapping("/new-user")
-    public User postNewUser(@RequestBody User user) {
-        return userRepository.postNewUser(user);
-    }
-
+public class GithubController {
 //Github API endpoints:
     //Get github auth link for user to accept/decline the scope of capabilities the app wants
     //Better than hardcoding into the frontend since changes to the API can be reflected easily in the
