@@ -36,7 +36,7 @@ export default class ItemBox extends Component {
             comment = 
             <form onSubmit={this.handleSubmit} style={{display: 'flex', flexDirection: 'row'}}>
                 <label style={{width: '100%'}}>
-                    <input type='text' value={this.state.newCommentValue} onChange={this.handleChange} placeholder="Enter a comment..."/>
+                    <input type='text' value={this.state.newCommentValue} onChange={this.handleChange} placeholder={this.props.comment}/>
                 </label>
             </form>
 
