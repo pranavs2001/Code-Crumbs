@@ -102,17 +102,21 @@ public class GithubController implements ErrorController {
 
     @PostMapping("/Github-access-token-response")
     public Map<String, String> postAccessToken(@RequestParam Map<String, String> allParams) {
-        String userId = allParams.get("userId");
-        String accessToken = allParams.get(Utils.ACCESS_TOKEN);
-
-        Map<String, String> temp = new HashMap<>();
-        temp.put(Utils.ACCESS_TOKEN, accessToken);
-        Map<String, Object> finalParams = new HashMap<>(temp);
-
-        userRepository.setUserField(userId, finalParams);
-
         HashMap<String, String> returnMap = new HashMap<>();
-        returnMap.put(Utils.STATUS, Utils.SUCCESS);
+        try {
+            String userId = allParams.get("userId");
+            String accessToken = allParams.get(Utils.ACCESS_TOKEN);
+
+            Map<String, String> temp = new HashMap<>();
+            temp.put(Utils.ACCESS_TOKEN, accessToken);
+            Map<String, Object> finalParams = new HashMap<>(temp);
+
+            userRepository.setUserField(userId, finalParams);
+
+            returnMap.put(Utils.STATUS, Utils.SUCCESS);
+        } catch (Exception e) {
+            returnMap.put(Utils.STATUS, Utils.ERROR + ": " + e.getLocalizedMessage());
+        }
         return returnMap;
     }
 
@@ -120,61 +124,64 @@ public class GithubController implements ErrorController {
     public ObjectNode getUserRepos(@RequestParam String userId) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objNode = mapper.createObjectNode();
+        try {
+            String accessToken = userRepository.getUserInfo(userId).getGithubAccessToken();
+            String[] urlElems = {Utils.GITHUB_API_BASE_URL, Utils.GITHUB_API_REPO_ENDPOINT};
+            String urlResource = urlFormatter(urlElems);
 
-        String accessToken = userRepository.getUserInfo(userId).getGithubAccessToken();
-        String[] urlElems = {Utils.GITHUB_API_BASE_URL, Utils.GITHUB_API_REPO_ENDPOINT};
-        String urlResource = urlFormatter(urlElems);
+            String[] keys = {Utils.ACCESS_TOKEN, Utils.VISIBILITY, Utils.SORT, Utils.PER_PAGE};
+            String[] values = {accessToken, Utils.ALL, Utils.FULL_NAME, Utils.HUNDRED};
+            Map<String, String> paramMap = parameterMap(keys, values);
 
-        String[] keys = {Utils.ACCESS_TOKEN, Utils.VISIBILITY, Utils.SORT, Utils.PER_PAGE};
-        String[] values = {accessToken, Utils.ALL, Utils.FULL_NAME, Utils.HUNDRED};
-        Map<String, String> paramMap = parameterMap(keys, values);
+            String finalResponse = postHelper(urlResource, paramMap);
 
-        String finalResponse = postHelper(urlResource, paramMap);
+            if(errorCheck(finalResponse)) {
+                objNode.put(Utils.STATUS, finalResponse);
+            } else {
+                JsonArray jsonobj = JsonParser.parseString(finalResponse).getAsJsonArray();
+                int i;
+                for(i = 0; i < jsonobj.size(); i++) {
+                    ObjectNode tempJson = mapper.createObjectNode();
+                    JsonObject temp = jsonobj.get(i).getAsJsonObject();
+                    JsonObject owner = temp.get("owner").getAsJsonObject();
+                    tempJson.put(Utils.OWNER, owner.get(Utils.LOGIN).getAsString());
+                    tempJson.put(Utils.REPO_NAME, temp.get(Utils.REPO_NAME).getAsString());
 
-        if(errorCheck(finalResponse)) {
-            objNode.put(Utils.STATUS, finalResponse);
-        } else {
-            JsonArray jsonobj = JsonParser.parseString(finalResponse).getAsJsonArray();
-            int i;
-            for(i = 0; i < jsonobj.size(); i++) {
-                ObjectNode tempJson = mapper.createObjectNode();
-                JsonObject temp = jsonobj.get(i).getAsJsonObject();
-                JsonObject owner = temp.get("owner").getAsJsonObject();
-                tempJson.put(Utils.OWNER, owner.get(Utils.LOGIN).getAsString());
-                tempJson.put(Utils.REPO_NAME, temp.get(Utils.REPO_NAME).getAsString());
+                    String[] tempUrlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[0] + "/", tempJson.get(Utils.OWNER) + "/", tempJson.get(Utils.REPO_NAME) + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1]};
+                    urlResource = urlFormatter(tempUrlElems);
 
-                String[] tempUrlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[0] + "/", tempJson.get(Utils.OWNER) + "/", tempJson.get(Utils.REPO_NAME) + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1]};
-                urlResource = urlFormatter(tempUrlElems);
+                    String[] keysTemp = {Utils.PER_PAGE, Utils.ACCESS_TOKEN};
+                    String[] valuesTemp = {Utils.HUNDRED, accessToken};
+                    paramMap.clear();
+                    paramMap = parameterMap(keysTemp, valuesTemp);
 
-                String[] keysTemp = {Utils.PER_PAGE, Utils.ACCESS_TOKEN};
-                String[] valuesTemp = {Utils.HUNDRED, accessToken};
-                paramMap.clear();
-                paramMap = parameterMap(keysTemp, valuesTemp);
+                    finalResponse = postHelper(urlResource, paramMap);
 
-                finalResponse = postHelper(urlResource, paramMap);
+                    if(errorCheck(finalResponse)) {
+                        continue;
+                    }
 
-                if(errorCheck(finalResponse)) {
-                    continue;
+                    JsonArray jsonCollaborators = JsonParser.parseString(finalResponse).getAsJsonArray();
+                    int j;
+                    ObjectNode collaboratorsArr = mapper.createObjectNode();
+                    for(j = 0; j < jsonCollaborators.size(); j++) {
+                        ObjectNode tempCollaboratorsJson = mapper.createObjectNode();
+                        JsonObject tempCollaborator = jsonCollaborators.get(i).getAsJsonObject();
+                        tempCollaboratorsJson.put(Utils.LOGIN, tempCollaborator.get(Utils.LOGIN).getAsString());
+
+                        collaboratorsArr.set(Integer.toString(j), tempCollaboratorsJson);
+                    }
+                    tempJson.set(Utils.COLLABORATORS, collaboratorsArr);
+                    tempJson.put(Utils.NUM_COLLABORATORS, Integer.toString(j));
+
+                    objNode.set(Integer.toString(i), tempJson);
                 }
-
-                JsonArray jsonCollaborators = JsonParser.parseString(finalResponse).getAsJsonArray();
-                int j;
-                ObjectNode collaboratorsArr = mapper.createObjectNode();
-                for(j = 0; j < jsonCollaborators.size(); j++) {
-                    ObjectNode tempCollaboratorsJson = mapper.createObjectNode();
-                    JsonObject tempCollaborator = jsonCollaborators.get(i).getAsJsonObject();
-                    tempCollaboratorsJson.put(Utils.LOGIN, tempCollaborator.get(Utils.LOGIN).getAsString());
-
-                    collaboratorsArr.set(Integer.toString(j), tempCollaboratorsJson);
-                }
-                tempJson.set(Utils.COLLABORATORS, collaboratorsArr);
-                tempJson.put(Utils.NUM_COLLABORATORS, Integer.toString(j));
-
-                objNode.set(Integer.toString(i), tempJson);
+                objNode.put(Utils.STATUS, Utils.SUCCESS);
+                objNode.put(Utils.NUM_REPOS, Integer.toString(i));
             }
-            objNode.put(Utils.STATUS, Utils.SUCCESS);
-            objNode.put(Utils.NUM_REPOS, Integer.toString(i));
-        }
+        } catch (Exception e) {
+            objNode.put(Utils.STATUS, Utils.ERROR + ": " + e.getLocalizedMessage());
+        } 
 
         return objNode;
     }
@@ -184,33 +191,38 @@ public class GithubController implements ErrorController {
                                     @RequestParam String repo) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objNode = mapper.createObjectNode();
-        objNode.put(Utils.OWNER, owner);
-        objNode.put(Utils.REPO_NAME, repo);
-        String accessToken = userRepository.getUserInfo(userId).getGithubAccessToken();
-        String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[0] + "/", owner + "/", repo + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1]};
-        String urlResource = urlFormatter(urlElems);
+        try {
+            objNode.put(Utils.OWNER, owner);
+            objNode.put(Utils.REPO_NAME, repo);
+            String accessToken = userRepository.getUserInfo(userId).getGithubAccessToken();
+            String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[0] + "/", owner + "/", repo + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1]};
+            String urlResource = urlFormatter(urlElems);
 
-        String[] keys = {Utils.ACCESS_TOKEN, Utils.PER_PAGE};
-        String[] values = {accessToken, Utils.HUNDRED};
-        Map<String, String> paramMap = parameterMap(keys, values);
+            String[] keys = {Utils.ACCESS_TOKEN, Utils.PER_PAGE};
+            String[] values = {accessToken, Utils.HUNDRED};
+            Map<String, String> paramMap = parameterMap(keys, values);
 
-        String finalResponse = postHelper(urlResource, paramMap);
+            String finalResponse = postHelper(urlResource, paramMap);
 
-        if(errorCheck(finalResponse)) {
-            objNode.put(Utils.STATUS, finalResponse);
-        } else {
-            JsonArray jsonCollaborators = JsonParser.parseString(finalResponse).getAsJsonArray();
-            int i;
-            ObjectNode collaboratorsArr = mapper.createObjectNode();
-            for(i = 0; i < jsonCollaborators.size(); i++) {
-                ObjectNode tempCollaboratorsJson = mapper.createObjectNode();
-                JsonObject tempCollaborator = jsonCollaborators.get(i).getAsJsonObject();
-                tempCollaboratorsJson.put(Utils.LOGIN, tempCollaborator.get(Utils.LOGIN).getAsString());
-                collaboratorsArr.set(Integer.toString(i), tempCollaboratorsJson);
+            if(errorCheck(finalResponse)) {
+                objNode.put(Utils.STATUS, finalResponse);
+            } else {
+                JsonArray jsonCollaborators = JsonParser.parseString(finalResponse).getAsJsonArray();
+                int i;
+                ObjectNode collaboratorsArr = mapper.createObjectNode();
+                for(i = 0; i < jsonCollaborators.size(); i++) {
+                    ObjectNode tempCollaboratorsJson = mapper.createObjectNode();
+                    JsonObject tempCollaborator = jsonCollaborators.get(i).getAsJsonObject();
+                    tempCollaboratorsJson.put(Utils.LOGIN, tempCollaborator.get(Utils.LOGIN).getAsString());
+                    collaboratorsArr.set(Integer.toString(i), tempCollaboratorsJson);
+                }
+                objNode.set(Utils.COLLABORATORS, collaboratorsArr);
+                objNode.put(Utils.NUM_COLLABORATORS, Integer.toString(i));
             }
-            objNode.set(Utils.COLLABORATORS, collaboratorsArr);
-            objNode.put(Utils.NUM_COLLABORATORS, Integer.toString(i));
+        } catch (Exception e) {
+            objNode.put(Utils.STATUS, Utils.ERROR + ": " + e.getLocalizedMessage());
         }
+        
         return objNode;
     }
 
@@ -220,33 +232,37 @@ public class GithubController implements ErrorController {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objNode = mapper.createObjectNode();
 
-        String accessToken = userRepository.getUserInfo(userId).getGithubAccessToken();
-        String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[0] + "/", owner + "/", repo + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[1]};
-        String urlResource = urlFormatter(urlElems);
+        try {
+            String accessToken = userRepository.getUserInfo(userId).getGithubAccessToken();
+            String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[0] + "/", owner + "/", repo + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[1]};
+            String urlResource = urlFormatter(urlElems);
 
-        String[] keys = {Utils.ACCESS_TOKEN, Utils.SINCE};
-        String[] values = {accessToken, since};
-        Map<String, String> paramMap = parameterMap(keys, values);
+            String[] keys = {Utils.ACCESS_TOKEN, Utils.SINCE};
+            String[] values = {accessToken, since};
+            Map<String, String> paramMap = parameterMap(keys, values);
 
-        String finalResponse = postHelper(urlResource, paramMap);
+            String finalResponse = postHelper(urlResource, paramMap);
 
-        JsonArray jsonobj = JsonParser.parseString(finalResponse).getAsJsonArray();
+            JsonArray jsonobj = JsonParser.parseString(finalResponse).getAsJsonArray();
 
-        if(errorCheck(finalResponse)) {
-            objNode.put(Utils.STATUS, finalResponse);
-        } else {
-            int i;
-            for(i = 0; i < jsonobj.size(); i++) {
-                ObjectNode tempJson = mapper.createObjectNode();
-                JsonObject temp = jsonobj.get(i).getAsJsonObject();
-                JsonObject commit = temp.get("commit").getAsJsonObject();
-                JsonObject author = commit.get("author").getAsJsonObject();
-                tempJson.put(Utils.REPO_NAME, author.get(Utils.REPO_NAME).getAsString());
-                tempJson.put(Utils.DATE, author.get(Utils.DATE).getAsString());
-                objNode.set(Integer.toString(i), tempJson);
+            if(errorCheck(finalResponse)) {
+                objNode.put(Utils.STATUS, finalResponse);
+            } else {
+                int i;
+                for(i = 0; i < jsonobj.size(); i++) {
+                    ObjectNode tempJson = mapper.createObjectNode();
+                    JsonObject temp = jsonobj.get(i).getAsJsonObject();
+                    JsonObject commit = temp.get("commit").getAsJsonObject();
+                    JsonObject author = commit.get("author").getAsJsonObject();
+                    tempJson.put(Utils.REPO_NAME, author.get(Utils.REPO_NAME).getAsString());
+                    tempJson.put(Utils.DATE, author.get(Utils.DATE).getAsString());
+                    objNode.set(Integer.toString(i), tempJson);
+                }
+                objNode.put(Utils.STATUS, Utils.SUCCESS);
+                objNode.put(Utils.NUM_COMMITS, Integer.toString(i));
             }
-            objNode.put(Utils.STATUS, Utils.SUCCESS);
-            objNode.put(Utils.NUM_COMMITS, Integer.toString(i));
+        } catch (Exception e) {
+            objNode.put(Utils.STATUS, Utils.ERROR + ": " + e.getLocalizedMessage());
         }
 
         return objNode;
