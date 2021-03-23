@@ -32,6 +32,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 public class GithubController {
+
+    @Autowired
+    UserRepository userRepository;
 //Github endpoints:
     //Get github auth link for user to accept/decline the scope of capabilities the app wants
     //Better than hardcoding into the frontend since changes to the API can be reflected easily in the
@@ -97,9 +100,24 @@ public class GithubController {
         return map;
     }
 
-    @PostMapping("/Github-auth-access-token")
+    @PostMapping("/Github-access-token-response")
     public Map<String, String> postAccessToken(@RequestParam Map<String, String> allParams) {
-        String authId = allParams.get("auth_id");
+        String userId = allParams.get("userId");
         String accessToken = allParams.get("access_token");
+
+        Map<String, String> temp = new HashMap<>();
+        temp.put("access_token", accessToken);
+        Map<String, Object> finalParams = new HashMap<>(temp);
+
+        userRepository.setUserField(userId, finalParams);
+
+        HashMap<String, String> returnMap = new HashMap<>();
+        returnMap.put("Status", "Success");
+        return returnMap;
+    }
+
+    @GetMapping("/Github-get-repos")
+    public Map<String, String> getUserRepos(String userId) {
+        
     }
 }

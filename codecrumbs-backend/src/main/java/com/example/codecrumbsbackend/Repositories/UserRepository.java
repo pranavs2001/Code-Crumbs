@@ -55,9 +55,9 @@ public class UserRepository {
 
     }
 
-    public User setUserField(String userId, String field, String value) {
+    public User setUserField(String userId, Map<String, Object> keyValuePairs) {
         try {
-            firebaseService.getDb().collection(Utils.USERS).document(userId).update(field, value);
+            firebaseService.getDb().collection(Utils.USERS).document(userId).update(keyValuePairs);
             return getUserInfo(userId);
         } catch (Exception e) {
             return new User();
