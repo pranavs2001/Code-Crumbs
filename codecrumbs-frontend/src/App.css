@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  padding: 24px
 }
 
 .App-logo {
@@ -26,6 +27,58 @@
 
 .App-link {
   color: #61dafb;
+}
+
+/* Component CSS Stylings */
+.itemBox {
+  background-color: #E6E6E6;
+  width: 352px;
+  height: 28px;
+  padding: 8px;
+  display: flex;
+  justify-content: left;
+  margin-bottom: 8px;
+}
+
+.itemBox p {
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+h1 {
+  font-family: "Roboto";
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  color: #000000;
+  opacity: 0.87;
+}
+
+.extensionH2 {
+  font-family: "Roboto";
+  font-size: 12px;
+  height: fit-content;
+  font-weight: bold;
+  text-align: left;
+  color: #000000;
+  opacity: 0.87;
+}
+
+.extensionBody {
+  font-family: "Roboto";
+  font-size: 8px;
+  font-weight: bold;
+  text-align: left;
+  color: #000000;
+  opacity: 0.60;
+}
+
+.imagePlaceholder {
+  height: 20px;
+  width: 20px;
+  background-color: #61dafb;
+  margin-left: 6px;
+  margin-top: 6dp;
 }
 
 @keyframes App-logo-spin {
