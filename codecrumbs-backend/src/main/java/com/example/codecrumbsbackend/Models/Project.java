@@ -10,7 +10,6 @@ import lombok.*;
 public class Project {
     private String name;
 
-    private String projectId;
     private String associatedUserId;
     private String timeOfCreation;
     private boolean active; // current project being tracked?

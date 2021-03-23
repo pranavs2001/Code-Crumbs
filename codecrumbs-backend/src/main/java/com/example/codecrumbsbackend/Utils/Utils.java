@@ -4,4 +4,5 @@ public class Utils {
 
     public static final String USERS = "users";
     public static final String PROJECTS = "projects";
+    public static final String SEARCHES = "searches";
 }
