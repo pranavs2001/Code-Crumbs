@@ -10,9 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 @Slf4j
@@ -39,6 +43,12 @@ public class CommentRepository {
 
             long now = Instant.now().toEpochMilli();
             comment.setTimeStamp(String.valueOf(now));
+
+            Date date = new Date(now);
+            DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            format.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+            String formatted = format.format(date);
+            comment.setTimeStampFormat(formatted);
 
             documentReference.set(comment, SetOptions.merge());
         }

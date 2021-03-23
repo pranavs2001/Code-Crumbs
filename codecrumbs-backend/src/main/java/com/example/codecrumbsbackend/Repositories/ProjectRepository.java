@@ -9,10 +9,10 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Slf4j
@@ -32,6 +32,13 @@ public class ProjectRepository {
 
             long now = Instant.now().toEpochMilli();
             project.setTimeOfCreation(String.valueOf(now));
+
+            Date date = new Date(now);
+            DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            format.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+            String formatted = format.format(date);
+            project.setTimeOfCreationFormat(formatted);
+
             project.setNumberOfSearches(0);
             documentReference.set(project, SetOptions.merge());
         }
@@ -72,6 +79,13 @@ public class ProjectRepository {
 
             long now = Instant.now().toEpochMilli();
             search.setTimeAccessed(String.valueOf(now));
+
+            Date date = new Date(now);
+            DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            format.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+            String formatted = format.format(date);
+            search.setTimeAccessedFormat(formatted);
+
             DocumentReference newDoc = collectionReference.document();
 
             String websiteId = newDoc.getId();
