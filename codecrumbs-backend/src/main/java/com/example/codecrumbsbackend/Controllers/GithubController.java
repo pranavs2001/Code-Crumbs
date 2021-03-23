@@ -237,10 +237,13 @@ public class GithubController implements ErrorController {
         } else {
             int i;
             for(i = 0; i < jsonobj.size(); i++) {
+                ObjectNode tempJson = mapper.createObjectNode();
                 JsonObject temp = jsonobj.get(i).getAsJsonObject();
                 JsonObject commit = temp.get("commit").getAsJsonObject();
                 JsonObject author = commit.get("author").getAsJsonObject();
-                objNode.set(Integer.toString(i), mapper.readTree(author.toString()));
+                tempJson.put(Utils.REPO_NAME, author.get(Utils.REPO_NAME).getAsString());
+                tempJson.put(Utils.DATE, author.get(Utils.DATE).getAsString());
+                objNode.set(Integer.toString(i), tempJson);
             }
             objNode.put(Utils.STATUS, Utils.SUCCESS);
             objNode.put(Utils.NUM_COMMITS, Integer.toString(i));

@@ -31,6 +31,7 @@ public class Utils {
     public static final String ALL = "all";
     public static final String FULL_NAME = "full_name";
     public static final String HUNDRED = "100";
+    public static final String DATE = "date";
 
     public static final String GITHUB_APP_AUTH_LINK = "https://github.com/login/oauth/authorize";
     public static final String GITHUB_APP_AUTH_ACCESS_TOKEN_LINK = "https://github.com/login/oauth/access_token";
