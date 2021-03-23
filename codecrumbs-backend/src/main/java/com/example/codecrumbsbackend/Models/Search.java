@@ -15,5 +15,6 @@ public class Search {
     private String websiteName;
     private String websiteUrl;
     private String timeAccessed;
+    private String timeAccessedFormat;
     private boolean starred;
 }

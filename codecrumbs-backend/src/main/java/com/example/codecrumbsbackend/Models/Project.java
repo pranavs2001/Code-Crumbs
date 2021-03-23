@@ -12,6 +12,7 @@ public class Project {
 
     private String associatedUserId;
     private String timeOfCreation;
+    private String timeOfCreationFormat;
     private int numberOfSearches;
     private boolean active; // current project being tracked?
 }
