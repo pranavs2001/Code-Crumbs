@@ -24,4 +24,6 @@ public class UserController {
     public User getUserInfo(@PathVariable("userId") String userId) {
         return userRepository.getUserInfo(userId);
     }
+
+    //Deleting a user?
 }

@@ -131,4 +131,22 @@ public class ProjectRepository {
         }
         return toReturn;
     }
+
+    public Search starSearch(Search search) {
+        try {
+            DocumentReference documentReference = firebaseService.getDb()
+                    .collection(Utils.USERS)
+                    .document(search.getAssociatedUserId())
+                    .collection(Utils.PROJECTS)
+                    .document(search.getAssociatedProjectName())
+                    .collection(Utils.SEARCHES)
+                    .document(search.getWebsiteId());
+
+            documentReference.update(Utils.STARRED, search.isStarred());
+        } catch (NullPointerException e) {
+            return new Search();
+        }
+        return search;
+    }
+    //Text summarizer
 }

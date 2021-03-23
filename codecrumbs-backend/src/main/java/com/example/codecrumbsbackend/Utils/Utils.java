@@ -8,6 +8,8 @@ public class Utils {
     public static final String NUMBER_OF_SEARCHES = "numberOfSearches";
     public static final String TIME_ACCESSED = "timeAccessed";
     public static final String COMMENTS = "comments";
+    public static final String STARRED = "starred";
+
     public static final String STATUS = "Status";
     public static final String SUCCESS = "Success";
     public static final String ACCESS_TOKEN = "access_token";
@@ -29,7 +31,7 @@ public class Utils {
     public static final String ALL = "all";
     public static final String FULL_NAME = "full_name";
     public static final String HUNDRED = "100";
-        
+
     public static final String GITHUB_APP_AUTH_LINK = "https://github.com/login/oauth/authorize";
     public static final String GITHUB_APP_AUTH_ACCESS_TOKEN_LINK = "https://github.com/login/oauth/access_token";
     public static final String GITHUB_APP_AUTH_SCOPE = "scope=repo";

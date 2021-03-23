@@ -16,5 +16,8 @@ public class Search {
     private String websiteUrl;
     private String timeAccessed;
     private String timeAccessedFormat;
+
+    //Only required if it is starred
     private boolean starred;
+    private String commitId;
 }

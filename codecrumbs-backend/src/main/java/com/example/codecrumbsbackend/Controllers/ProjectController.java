@@ -40,5 +40,9 @@ public class ProjectController {
         return projectRepository.getMostRecentSearchesLimited(limit.getLimit(), limit.getProjectUser());
     }
 
+    @PutMapping("/star-search") //can either set starred to true or false
+    public Search starSearch(@RequestBody Search search) { //only websiteId (searchId), associatedUserId, and associatedProjectName, starred, and commitId need to be filled
+        return projectRepository.starSearch(search);
+    }
     //Add filtering keywords to filter search history
 }
