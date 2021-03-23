@@ -15,7 +15,6 @@ class Auth extends React.Component {
         this.setState({
             login: !this.state.login,
         });
-        console.log("haha yes");
     }
 
     render() {
