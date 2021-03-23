@@ -143,6 +143,7 @@ public class ProjectRepository {
                     .document(search.getWebsiteId());
 
             documentReference.update(Utils.STARRED, search.isStarred());
+            documentReference.update(Utils.COMMIT_ID, search.getCommitId());
         } catch (NullPointerException e) {
             return new Search();
         }

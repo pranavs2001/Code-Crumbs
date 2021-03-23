@@ -48,7 +48,7 @@ public class GithubController implements ErrorController {
 
     @Autowired
     UserRepository userRepository;
-    
+
     private static final String PATH = "/error";
 
     @RequestMapping(value = PATH)
@@ -83,9 +83,9 @@ public class GithubController implements ErrorController {
             String[] keys = {Utils.GITHUB_API_CLIENT_ID_KEY, Utils.GITHUB_API_CLIENT_SECRET_KEY, Utils.GITHUB_API_CODE_KEY};
             String[] values = {System.getenv("GITHUB_APP_CLIENT_ID"), System.getenv("GITHUB_APP_CLIENT_SECRET"), code};
             Map<String, String> urlParams = parameterMap(keys, values);
-            
+
             String finalResponse = postHelper(urlBase, urlParams);
-            
+
             if(errorCheck(finalResponse)) {
                 map.put(Utils.STATUS, finalResponse);
             } else {
@@ -120,7 +120,7 @@ public class GithubController implements ErrorController {
     public ObjectNode getUserRepos(@RequestParam String userId) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objNode = mapper.createObjectNode();
-        
+
         String accessToken = userRepository.getUserInfo(userId).getGithubAccessToken();
         String[] urlElems = {Utils.GITHUB_API_BASE_URL, Utils.GITHUB_API_REPO_ENDPOINT};
         String urlResource = urlFormatter(urlElems);
@@ -142,17 +142,17 @@ public class GithubController implements ErrorController {
                 JsonObject owner = temp.get("owner").getAsJsonObject();
                 tempJson.put(Utils.OWNER, owner.get(Utils.LOGIN).getAsString());
                 tempJson.put(Utils.REPO_NAME, temp.get(Utils.REPO_NAME).getAsString());
-    
+
                 String[] tempUrlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[0] + "/", tempJson.get(Utils.OWNER) + "/", tempJson.get(Utils.REPO_NAME) + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1]};
                 urlResource = urlFormatter(tempUrlElems);
-                
+
                 String[] keysTemp = {Utils.PER_PAGE, Utils.ACCESS_TOKEN};
                 String[] valuesTemp = {Utils.HUNDRED, accessToken};
                 paramMap.clear();
                 paramMap = parameterMap(keysTemp, valuesTemp);
 
                 finalResponse = postHelper(urlResource, paramMap);
-    
+
                 if(errorCheck(finalResponse)) {
                     continue;
                 }
@@ -164,23 +164,23 @@ public class GithubController implements ErrorController {
                     ObjectNode tempCollaboratorsJson = mapper.createObjectNode();
                     JsonObject tempCollaborator = jsonCollaborators.get(i).getAsJsonObject();
                     tempCollaboratorsJson.put(Utils.LOGIN, tempCollaborator.get(Utils.LOGIN).getAsString());
-                    
+
                     collaboratorsArr.set(Integer.toString(j), tempCollaboratorsJson);
                 }
                 tempJson.set(Utils.COLLABORATORS, collaboratorsArr);
                 tempJson.put(Utils.NUM_COLLABORATORS, Integer.toString(j));
-    
+
                 objNode.set(Integer.toString(i), tempJson);
             }
             objNode.put(Utils.STATUS, Utils.SUCCESS);
             objNode.put(Utils.NUM_REPOS, Integer.toString(i));
         }
-        
+
         return objNode;
     }
 
     @GetMapping("/Github-get-repo")
-    public ObjectNode getUserRepo(@RequestParam String userId, @RequestParam String owner, 
+    public ObjectNode getUserRepo(@RequestParam String userId, @RequestParam String owner,
                                     @RequestParam String repo) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objNode = mapper.createObjectNode();
@@ -195,7 +195,7 @@ public class GithubController implements ErrorController {
         Map<String, String> paramMap = parameterMap(keys, values);
 
         String finalResponse = postHelper(urlResource, paramMap);
-        
+
         if(errorCheck(finalResponse)) {
             objNode.put(Utils.STATUS, finalResponse);
         } else {
@@ -213,9 +213,9 @@ public class GithubController implements ErrorController {
         }
         return objNode;
     }
-    
+
     @GetMapping("/Github-get-commits")
-    public ObjectNode getUserCommits(@RequestParam String userId, @RequestParam String owner, 
+    public ObjectNode getUserCommits(@RequestParam String userId, @RequestParam String owner,
                                                 @RequestParam String repo, @RequestParam String since) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objNode = mapper.createObjectNode();
@@ -283,7 +283,7 @@ public class GithubController implements ErrorController {
                 }
                 String finalResponse = response.toString();
                 return finalResponse;
-            }        
+            }
         } catch (Exception e) {
             return Utils.ERROR + e.getLocalizedMessage();
         }
