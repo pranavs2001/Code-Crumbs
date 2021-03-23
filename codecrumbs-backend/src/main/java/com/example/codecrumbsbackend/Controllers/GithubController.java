@@ -39,14 +39,27 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-public class GithubController {
+public class GithubController implements ErrorController {
 
     @Autowired
     UserRepository userRepository;
+    
+    private static final String PATH = "/error";
+
+    @RequestMapping(value = PATH)
+    public String errorMessage() {
+        return "<p><span style=\"background-color: #ff0000;\">You Absolute Monkey Man</span></p><p><span style=\"background-color: #ff0000;\">What the AIDS are you doing?</span></p><p>&nbsp;</p><p><img src=\"https://i.redd.it/sfnfaudnmqo41.jpg\" alt=\"\" width=\"243\" height=\"276\" /></p>";
+    }
+
+    @Override
+    public String getErrorPath() {
+        return PATH;
+    }
 //Github endpoints:
     //Get github auth link for user to accept/decline the scope of capabilities the app wants
     //Better than hardcoding into the frontend since changes to the API can be reflected easily in the
