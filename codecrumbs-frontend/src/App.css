@@ -33,17 +33,54 @@
 .itemBox {
   background-color: #E6E6E6;
   width: 352px;
-  height: 28px;
+  height: fit-content;
   padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+}
+
+.itemBox.content {
+  height: fit-content;
+}
+
+.itemBox.current {
+  background-color: #FFA852;
+}
+
+.itemBoxContent {
   display: flex;
   justify-content: left;
   margin-bottom: 8px;
+}
+
+.commentBox {
+  text-align: left;
+  background-color: #FFFFFF;  
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.current .commentBox {
+  color: rgba(255, 168, 82, 0.40);
+}
+
+.current .extensionH2 {
+  color: rgba(255, 255, 255, 0.87);
 }
 
 .itemBox p {
   margin-bottom: 0px;
   margin-top: 0px;
 }
+
+.imagePlaceholder {
+  height: 20px;
+  width: 20px;
+  background-color: #61dafb;
+  border-radius: 6px;
+}
+
+/* General Stylings */
 
 h1 {
   font-family: "Roboto";
@@ -57,7 +94,6 @@ h1 {
 .extensionH2 {
   font-family: "Roboto";
   font-size: 12px;
-  height: fit-content;
   font-weight: bold;
   text-align: left;
   color: #000000;
@@ -73,12 +109,14 @@ h1 {
   opacity: 0.60;
 }
 
-.imagePlaceholder {
+input {
+  width: 331px;
   height: 20px;
-  width: 20px;
-  background-color: #61dafb;
-  margin-left: 6px;
-  margin-top: 6dp;
+  border-radius: 6px;
+  border-width: 0px;
+  padding-left: 8px;
+  font-family: "Roboto";
+  font-size: 10px;
 }
 
 @keyframes App-logo-spin {
