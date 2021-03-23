@@ -89,13 +89,13 @@ public class GithubController implements ErrorController {
             if(errorCheck(finalResponse)) {
                 map.put(Utils.STATUS, finalResponse);
             } else {
-                String[] responseComponents = finalResponse.split("&");
-                String accessToken = responseComponents[0].split("=")[1];
+                JsonObject jsonobj = JsonParser.parseString(finalResponse).getAsJsonObject();
+                String accessToken = jsonobj.get(Utils.ACCESS_TOKEN).getAsString();
                 map.put(Utils.STATUS, Utils.SUCCESS);
                 map.put(Utils.ACCESS_TOKEN_KEY, accessToken);
             }
         } catch (Exception e) {
-            map.put(Utils.STATUS, "Error: " + e.getLocalizedMessage());
+            map.put(Utils.STATUS, Utils.ERROR + ": " + e.getLocalizedMessage());
         }
         return map;
     }
