@@ -1,15 +1,13 @@
 package com.example.codecrumbsbackend.Controllers;
 
+import com.example.codecrumbsbackend.Models.Limit;
 import com.example.codecrumbsbackend.Models.Project;
 import com.example.codecrumbsbackend.Models.ProjectUser;
 import com.example.codecrumbsbackend.Models.Search;
 import com.example.codecrumbsbackend.Repositories.ProjectRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,5 +35,10 @@ public class ProjectController {
         return projectRepository.addNewSearch(search);
     }
 
-    //Add filtering keywords
+    @GetMapping("/most-recent-limited-searches")
+    public List<Search> getMostRecentSearchesLimited(@RequestBody Limit limit) {
+        return projectRepository.getMostRecentSearchesLimited(limit.getLimit(), limit.getProjectUser());
+    }
+
+    //Add filtering keywords to filter search history
 }

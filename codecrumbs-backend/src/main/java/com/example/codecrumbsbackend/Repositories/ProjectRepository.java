@@ -3,16 +3,15 @@ package com.example.codecrumbsbackend.Repositories;
 import com.example.codecrumbsbackend.Models.*;
 import com.example.codecrumbsbackend.Utils.Utils;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.SetOptions;
+import com.google.cloud.firestore.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -33,7 +32,7 @@ public class ProjectRepository {
 
             long now = Instant.now().toEpochMilli();
             project.setTimeOfCreation(String.valueOf(now));
-
+            project.setNumberOfSearches(0);
             documentReference.set(project, SetOptions.merge());
         }
         catch (NullPointerException e) {
@@ -78,10 +77,44 @@ public class ProjectRepository {
             String websiteId = newDoc.getId();
             search.setWebsiteId(websiteId);
             newDoc.set(search, SetOptions.merge());
+
+            //Increment Number of Searches
+            int numOfSearches = getProjectByName(new ProjectUser(search.getAssociatedProjectName(), search.getAssociatedUserId())).getNumberOfSearches();
+            DocumentReference documentReference = firebaseService.getDb()
+                    .collection(Utils.USERS)
+                    .document(search.getAssociatedUserId())
+                    .collection(Utils.PROJECTS)
+                    .document(search.getAssociatedProjectName());
+            documentReference.update(Utils.NUMBER_OF_SEARCHES, numOfSearches + 1);
+
         }
         catch (NullPointerException e) {
             return new Search();
         }
         return search;
+    }
+
+    public List<Search> getMostRecentSearchesLimited(int limit, ProjectUser projectUser) {
+        List<Search> toReturn = new ArrayList<>();
+        try {
+            Query collectionReference = firebaseService.getDb()
+                    .collection(Utils.USERS)
+                    .document(projectUser.getUserId())
+                    .collection(Utils.PROJECTS)
+                    .document(projectUser.getProjectName())
+                    .collection(Utils.SEARCHES).orderBy(Utils.TIME_ACCESSED, Query.Direction.DESCENDING).limit(limit);
+
+            ApiFuture<QuerySnapshot> collectionFuture = collectionReference.get();
+            List<QueryDocumentSnapshot> docs = collectionFuture.get().getDocuments();
+
+            for (QueryDocumentSnapshot snap : docs) {
+                toReturn.add(snap.toObject(Search.class));
+            }
+
+
+        } catch (InterruptedException | ExecutionException | NullPointerException e) {
+            return new ArrayList<>();
+        }
+        return toReturn;
     }
 }

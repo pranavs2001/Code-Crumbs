@@ -100,6 +100,7 @@ public class GithubController {
         return map;
     }
 
+
     @PostMapping("/Github-access-token-response")
     public Map<String, String> postAccessToken(@RequestParam Map<String, String> allParams) {
         String userId = allParams.get("userId");
@@ -119,5 +120,11 @@ public class GithubController {
     @GetMapping("/Github-get-repos")
     public Map<String, String> getUserRepos(String userId) {
         
+    }
+
+    @PostMapping("/Github-auth-access-token")
+    public Map<String, String> postAccessToken(@RequestParam Map<String, String> allParams) {
+        String authId = allParams.get("auth_id");
+        String accessToken = allParams.get("access_token");
     }
 }
