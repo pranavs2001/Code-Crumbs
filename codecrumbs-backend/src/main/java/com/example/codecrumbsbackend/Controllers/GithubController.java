@@ -20,6 +20,7 @@ import javax.print.attribute.HashAttributeSet;
 import com.example.codecrumbsbackend.Models.User;
 import com.example.codecrumbsbackend.Repositories.FirebaseService;
 import com.example.codecrumbsbackend.Repositories.UserRepository;
+import com.example.codecrumbsbackend.Utils.Utils;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,15 +32,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 public class GithubController {
-//Github API endpoints:
+//Github endpoints:
     //Get github auth link for user to accept/decline the scope of capabilities the app wants
     //Better than hardcoding into the frontend since changes to the API can be reflected easily in the
     //app.yaml file
     //The client id and secret are environment variables for security purposes, found in app.yaml
     @GetMapping("/Github-auth-link")
     public Map<String, String> getGithubAuthLink() {
-        String githubAuthUrl = System.getenv("GITHUB_APP_AUTH_LINK") + "?";
-        githubAuthUrl += System.getenv("GITHUB_APP_AUTH_SCOPE") + "&";
+        String githubAuthUrl = Utils.GITHUB_APP_AUTH_LINK + "?";
+        githubAuthUrl += Utils.GITHUB_APP_AUTH_SCOPE + "&";
         githubAuthUrl += "client_id=" + System.getenv("GITHUB_APP_CLIENT_ID");
         HashMap<String, String> map = new HashMap<>();
         map.put("Status", "Success");
@@ -49,7 +50,7 @@ public class GithubController {
 
     @GetMapping("/Github-auth-callback")
     public Map<String, String> getGithubAuthCallback(@RequestParam String code) {
-        String urlBase = System.getenv("GITHUB_APP_AUTH_ACCESS_TOKEN_LINK");
+        String urlBase = Utils.GITHUB_APP_AUTH_ACCESS_TOKEN_LINK;
         HashMap<String, String> map = new HashMap<>();
         try {
             URL url = new URL(System.getenv(urlBase));
@@ -86,10 +87,19 @@ public class GithubController {
                 String finalResponse = response.toString();
                 String[] responseComponents = finalResponse.split("&");
                 String accessToken = responseComponents[0].split("=")[1];
-            }
+                map.put("Status", "Success");
+                map.put("AccessToken", accessToken);
+                return map;
+            }            
         } catch (Exception e) {
             map.put("Status", "Error: " + e.getLocalizedMessage());
         }
         return map;
+    }
+
+    @PostMapping("/Github-auth-access-token")
+    public Map<String, String> postAccessToken(@RequestParam Map<String, String> allParams) {
+        String authId = allParams.get("auth_id");
+        String accessToken = allParams.get("access_token");
     }
 }

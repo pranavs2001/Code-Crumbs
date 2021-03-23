@@ -10,7 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import javax.print.Doc;
 
 @Slf4j
 @Repository
@@ -50,5 +53,14 @@ public class UserRepository {
         }
         return new User();
 
+    }
+
+    public User setUserField(String userId, String field, String value) {
+        try {
+            firebaseService.getDb().collection(Utils.USERS).document(userId).update(field, value);
+            return getUserInfo(userId);
+        } catch (Exception e) {
+            return new User();
+        }
     }
 }
