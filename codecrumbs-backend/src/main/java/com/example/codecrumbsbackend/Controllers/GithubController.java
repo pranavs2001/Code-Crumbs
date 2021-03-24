@@ -20,7 +20,9 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 import javax.print.attribute.HashAttributeSet;
-
+import com.example.codecrumbsbackend.Models.AccessToken;
+import com.example.codecrumbsbackend.Models.Repository;
+import com.example.codecrumbsbackend.Models.Commit;
 
 import com.example.codecrumbsbackend.Models.User;
 import com.example.codecrumbsbackend.Repositories.FirebaseService;
@@ -101,17 +103,14 @@ public class GithubController implements ErrorController {
     }
 
     @PostMapping("/Github-access-token-response")
-    public Map<String, String> postAccessToken(@RequestParam Map<String, String> allParams) {
+    public Map<String, String> postAccessToken(@RequestBody AccessToken accessToken) {
         HashMap<String, String> returnMap = new HashMap<>();
         try {
-            String userId = allParams.get("userId");
-            String accessToken = allParams.get(Utils.ACCESS_TOKEN);
-
             Map<String, String> temp = new HashMap<>();
-            temp.put(Utils.ACCESS_TOKEN, accessToken);
+            temp.put(Utils.ACCESS_TOKEN, accessToken.getAccessToken());
             Map<String, Object> finalParams = new HashMap<>(temp);
 
-            userRepository.setUserField(userId, finalParams);
+            userRepository.setUserField(accessToken.getUserId(), finalParams);
 
             returnMap.put(Utils.STATUS, Utils.SUCCESS);
         } catch (Exception e) {
@@ -187,15 +186,14 @@ public class GithubController implements ErrorController {
     }
 
     @GetMapping("/Github-get-repo")
-    public ObjectNode getUserRepo(@RequestParam String userId, @RequestParam String owner,
-                                    @RequestParam String repo) {
+    public ObjectNode getUserRepo(@RequestBody Repository repository) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objNode = mapper.createObjectNode();
         try {
-            objNode.put(Utils.OWNER, owner);
-            objNode.put(Utils.REPO_NAME, repo);
-            String accessToken = userRepository.getUserInfo(userId).getGithubAccessToken();
-            String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[0] + "/", owner + "/", repo + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1]};
+            objNode.put(Utils.OWNER, repository.getOwner());
+            objNode.put(Utils.REPO_NAME, repository.getRepo());
+            String accessToken = userRepository.getUserInfo(repository.getUserId()).getGithubAccessToken();
+            String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[0] + "/", repository.getOwner() + "/", repository.getRepo() + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1]};
             String urlResource = urlFormatter(urlElems);
 
             String[] keys = {Utils.ACCESS_TOKEN, Utils.PER_PAGE};
@@ -216,6 +214,7 @@ public class GithubController implements ErrorController {
                     tempCollaboratorsJson.put(Utils.LOGIN, tempCollaborator.get(Utils.LOGIN).getAsString());
                     collaboratorsArr.set(Integer.toString(i), tempCollaboratorsJson);
                 }
+                objNode.put(Utils.STATUS, Utils.SUCCESS);
                 objNode.set(Utils.COLLABORATORS, collaboratorsArr);
                 objNode.put(Utils.NUM_COLLABORATORS, Integer.toString(i));
             }
@@ -227,18 +226,17 @@ public class GithubController implements ErrorController {
     }
 
     @GetMapping("/Github-get-commits")
-    public ObjectNode getUserCommits(@RequestParam String userId, @RequestParam String owner,
-                                                @RequestParam String repo, @RequestParam String since) {
+    public ObjectNode getUserCommits(@RequestBody Commit commit) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objNode = mapper.createObjectNode();
 
         try {
-            String accessToken = userRepository.getUserInfo(userId).getGithubAccessToken();
-            String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[0] + "/", owner + "/", repo + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[1]};
+            String accessToken = userRepository.getUserInfo(commit.getUserId()).getGithubAccessToken();
+            String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[0] + "/", commit.getOwner() + "/", commit.getRepo() + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[1]};
             String urlResource = urlFormatter(urlElems);
 
             String[] keys = {Utils.ACCESS_TOKEN, Utils.SINCE};
-            String[] values = {accessToken, since};
+            String[] values = {accessToken, commit.getSince()};
             Map<String, String> paramMap = parameterMap(keys, values);
 
             String finalResponse = postHelper(urlResource, paramMap);
@@ -252,8 +250,8 @@ public class GithubController implements ErrorController {
                 for(i = 0; i < jsonobj.size(); i++) {
                     ObjectNode tempJson = mapper.createObjectNode();
                     JsonObject temp = jsonobj.get(i).getAsJsonObject();
-                    JsonObject commit = temp.get("commit").getAsJsonObject();
-                    JsonObject author = commit.get("author").getAsJsonObject();
+                    JsonObject commitTemp = temp.get("commit").getAsJsonObject();
+                    JsonObject author = commitTemp.get("author").getAsJsonObject();
                     tempJson.put(Utils.REPO_NAME, author.get(Utils.REPO_NAME).getAsString());
                     tempJson.put(Utils.DATE, author.get(Utils.DATE).getAsString());
                     objNode.set(Integer.toString(i), tempJson);
