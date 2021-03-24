@@ -11,6 +11,8 @@ public class Utils {
     public static final String STARRED = "starred";
     public static final String COMMIT_ID = "commitId";
 
+    public static final String SCREENSHOT_URL = "https://us-central1-codecrumbs.cloudfunctions.net/website-screenshot";
+
     public static final String STATUS = "Status";
     public static final String SUCCESS = "Success";
     public static final String ACCESS_TOKEN = "access_token";

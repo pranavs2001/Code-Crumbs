@@ -8,6 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -91,6 +98,12 @@ public class ProjectRepository {
             search.setWebsiteId(websiteId);
             newDoc.set(search, SetOptions.merge());
 
+            //SCREENSHOT THE URL
+            boolean a = takeScreenshot(search.getWebsiteUrl());
+            //EXTRACT THE TEXT
+
+            //FIND BUZZWORDS
+
             //Increment Number of Searches
             int numOfSearches = getProjectByName(new ProjectUser(search.getAssociatedProjectName(), search.getAssociatedUserId())).getNumberOfSearches();
             DocumentReference documentReference = firebaseService.getDb()
@@ -101,7 +114,7 @@ public class ProjectRepository {
             documentReference.update(Utils.NUMBER_OF_SEARCHES, numOfSearches + 1);
 
         }
-        catch (NullPointerException e) {
+        catch (NullPointerException | IOException e) {
             return new Search();
         }
         return search;
@@ -148,5 +161,32 @@ public class ProjectRepository {
         }
         return search;
     }
-    //Text summarizer
+
+
+    //PRIVATE METHODS FOR TEXT SUMMARIZER
+    private boolean takeScreenshot(String curr_url) throws IOException {
+        URL url = new URL(Utils.SCREENSHOT_URL);
+        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json; utf-8");
+        con.setRequestProperty("Accept", "application/json");
+        con.setDoOutput(true);
+        String jsonInputString = "{\"url\": \"" + curr_url + "\" }"; //the issue might be here, the curr_url in itself has some slashes in it, confirm 422 error code by running postman with url without those slashes
+        try(OutputStream os = con.getOutputStream()) {
+            byte[] input = jsonInputString.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        String final_response = "";
+        try(BufferedReader br = new BufferedReader(
+                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+            StringBuilder response = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+            final_response = response.toString();
+        }
+        return true;
+    }
 }
