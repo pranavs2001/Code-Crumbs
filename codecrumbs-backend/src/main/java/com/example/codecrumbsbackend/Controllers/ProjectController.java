@@ -45,4 +45,16 @@ public class ProjectController {
         return projectRepository.starSearch(search);
     }
     //Add filtering keywords to filter search history
+    //delete search
+
+    @DeleteMapping("/delete-search")
+    public Search deleteSearch(@RequestBody Search search) {
+        return projectRepository.deleteSearch(search);
+    }
+
+    @DeleteMapping("/delete-project")
+    public Project deleteProject(@RequestBody Project project) {
+        return projectRepository.deleteProject(project);
+    }
+
 }

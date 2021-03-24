@@ -1,10 +1,21 @@
 package com.example.codecrumbsbackend.Repositories;
 
 import com.example.codecrumbsbackend.Models.*;
+import com.example.codecrumbsbackend.Secrets.Secrets;
 import com.example.codecrumbsbackend.Utils.Utils;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.tomcat.util.json.JSONParser;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -99,8 +110,13 @@ public class ProjectRepository {
             newDoc.set(search, SetOptions.merge());
 
             //SCREENSHOT THE URL
-            boolean a = takeScreenshot(search.getWebsiteUrl());
+            String screenshotUrl = takeScreenshot(search.getWebsiteUrl());
+            if (screenshotUrl == null)
+                throw new NullPointerException();
             //EXTRACT THE TEXT
+            String textracted = textract("gs://website-screenshots-hacks/" + screenshotUrl);
+            if (textracted == null)
+                throw new NullPointerException();
 
             //FIND BUZZWORDS
 
@@ -114,7 +130,7 @@ public class ProjectRepository {
             documentReference.update(Utils.NUMBER_OF_SEARCHES, numOfSearches + 1);
 
         }
-        catch (NullPointerException | IOException e) {
+        catch (NullPointerException | IOException | JSONException e) {
             return new Search();
         }
         return search;
@@ -162,31 +178,77 @@ public class ProjectRepository {
         return search;
     }
 
+    public Search deleteSearch(Search search) {
+        ApiFuture<WriteResult> writeResult = firebaseService.getDb()
+                .collection(Utils.USERS)
+                .document(search.getAssociatedUserId())
+                .collection(Utils.PROJECTS)
+                .document(search.getAssociatedProjectName())
+                .collection(Utils.SEARCHES)
+                .document(search.getWebsiteId()).delete();
+        return search;
+    }
+
+    public Project deleteProject(Project project) {
+        ApiFuture<WriteResult> writeResult = firebaseService.getDb()
+                .collection(Utils.USERS)
+                .document(project.getAssociatedUserId())
+                .collection(Utils.PROJECTS)
+                .document(project.getName()).delete();
+        return project;
+    }
+
 
     //PRIVATE METHODS FOR TEXT SUMMARIZER
-    private boolean takeScreenshot(String curr_url) throws IOException {
-        URL url = new URL(Utils.SCREENSHOT_URL);
-        HttpURLConnection con = (HttpURLConnection)url.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "application/json; utf-8");
-        con.setRequestProperty("Accept", "application/json");
-        con.setDoOutput(true);
-        String jsonInputString = "{\"url\": \"" + curr_url + "\" }"; //the issue might be here, the curr_url in itself has some slashes in it, confirm 422 error code by running postman with url without those slashes
-        try(OutputStream os = con.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes("utf-8");
-            os.write(input, 0, input.length);
+    private String takeScreenshot(String curr_url) throws IOException, JSONException {
+        String payload = "{" + "\"url\":" + "\"" + curr_url + "\"" + "}";
+        StringEntity entity = new StringEntity(payload,
+                ContentType.APPLICATION_JSON);
+
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost request = new HttpPost(Utils.SCREENSHOT_URL);
+        request.setEntity(entity);
+
+        HttpResponse response = httpClient.execute(request);
+
+        if (response.getStatusLine().getStatusCode() != 200)
+            return null;
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+        StringBuilder builder = new StringBuilder();
+        for (String line = null; (line = reader.readLine()) != null;) {
+            builder.append(line).append("\n");
         }
 
-        String final_response = "";
-        try(BufferedReader br = new BufferedReader(
-                new InputStreamReader(con.getInputStream(), "utf-8"))) {
-            StringBuilder response = new StringBuilder();
-            String responseLine = null;
-            while ((responseLine = br.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
-            final_response = response.toString();
+        JSONObject json = new JSONObject(builder.toString());
+
+        return json.getString("screenshotUrl");
+
+    }
+
+    private String textract(String gcsImageUri) throws IOException, JSONException {
+        String payload = "{ \"requests\":[{\"image\":{\"source\":{\"gcsImageUri\":\"" + gcsImageUri + "\"}},\"features\":[{\"type\":\"TEXT_DETECTION\",\"maxResults\":10}]}]}";
+
+        StringEntity entity = new StringEntity(payload,
+                ContentType.APPLICATION_JSON);
+
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost request = new HttpPost(Utils.TEXTRACT_URL + Secrets.TEXTRACT_KEY);
+        request.setEntity(entity);
+
+        HttpResponse response = httpClient.execute(request);
+
+        if (response.getStatusLine().getStatusCode() != 200)
+            return null;
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+        StringBuilder builder = new StringBuilder();
+        for (String line = null; (line = reader.readLine()) != null;) {
+            builder.append(line).append("\n");
         }
-        return true;
+
+        JSONObject json = new JSONObject(builder.toString());
+
+        return json.getJSONArray(Utils.RESPONSES).getJSONObject(0).getJSONArray(Utils.TEXT_ANNOTATIONS).getJSONObject(0).getString(Utils.DESCRIPTION);
     }
 }
