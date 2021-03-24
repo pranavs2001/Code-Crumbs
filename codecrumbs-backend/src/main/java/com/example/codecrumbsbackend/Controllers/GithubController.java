@@ -62,7 +62,7 @@ public class GithubController implements ErrorController {
     public String getErrorPath() {
         return PATH;
     }
-//Github endpoints:
+    //Github endpoints:
     //Get github auth link for user to accept/decline the scope of capabilities the app wants
     //Better than hardcoding into the frontend since changes to the API can be reflected easily in the
     //app.yaml file
@@ -180,7 +180,7 @@ public class GithubController implements ErrorController {
             }
         } catch (Exception e) {
             objNode.put(Utils.STATUS, Utils.ERROR + ": " + e.getLocalizedMessage());
-        } 
+        }
 
         return objNode;
     }
@@ -221,7 +221,7 @@ public class GithubController implements ErrorController {
         } catch (Exception e) {
             objNode.put(Utils.STATUS, Utils.ERROR + ": " + e.getLocalizedMessage());
         }
-        
+
         return objNode;
     }
 

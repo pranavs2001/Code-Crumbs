@@ -84,4 +84,17 @@ public class CommentRepository {
         }
         return toReturn;
     }
+
+    public Comment deleteComment(Comment comment) {
+        ApiFuture<WriteResult> writeResult = firebaseService.getDb()
+                .collection(Utils.USERS)
+                .document(comment.getProjectUser().getUserId())
+                .collection(Utils.PROJECTS)
+                .document(comment.getProjectUser().getProjectName())
+                .collection(Utils.SEARCHES)
+                .document(comment.getAssociatedSearchId())
+                .collection(Utils.COMMENTS)
+                .document(comment.getCommentId()).delete();
+        return comment;
+    }
 }
