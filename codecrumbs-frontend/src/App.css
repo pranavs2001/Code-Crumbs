@@ -60,6 +60,10 @@
   border-radius: 6px;
 }
 
+.iconBox {
+  margin-left: 8px;
+}
+
 .current .commentBox {
   color: rgba(255, 168, 82, 0.40);
 }
@@ -81,6 +85,10 @@
 }
 
 /* General Stylings */
+
+p {
+  text-align: left;
+}
 
 h1 {
   font-family: "Roboto";

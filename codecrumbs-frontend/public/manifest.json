@@ -9,5 +9,12 @@
   "browser_action": {
       "default_icon": "logo512.png",
       "default_popup": "popup.html"
+  },
+  "permissions": [
+    "tabs"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
   }
 }
