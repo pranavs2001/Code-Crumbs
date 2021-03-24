@@ -9,5 +9,6 @@
   "browser_action": {
       "default_icon": "logo512.png",
       "default_popup": "popup.html"
-  }
+  },
+  "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'"
 }

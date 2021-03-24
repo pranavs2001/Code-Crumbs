@@ -1,6 +1,54 @@
-import React from 'react';
+import React from "react";
+import { Router, Link } from "@reach/router";
+import SignIn from "./SignIn";
+import SignUp from "./SignUp";
+import ProfilePage from "./ProfilePage";
+import PasswordReset from "./PasswordReset";
+
+function Authentication() {
+    const user = null;
+    return (
+        user ?
+            <ProfilePage />
+            :
+            <div>
+                <nav>
+                    <Link to="/">Sign In</Link>
+                    <Link to="signUp">Sign Up</Link>
+                    <Link to="passwordReset">Reset Password</Link>
+                </nav>
+                <Router>
+                    <SignUp path="signUp" />
+                    <SignIn path="/" />
+                    <PasswordReset path="passwordReset" />
+                </Router>
+            </div>
+
+    );
+}
+
+export default Authentication;
+
+/*import React from 'react';
 import ReactDOM from 'react-dom';
 import './auth.css';
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/firestore';
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAxAxnARXfjoB33h2lTUXq_wpD7BNFOkic",
+    authDomain: "codecrumbs.firebaseapp.com",
+    projectId: "codecrumbs",
+    storageBucket: "codecrumbs.appspot.com",
+    messagingSenderId: "678789643037",
+    appId: "1:678789643037:web:a8ca99ad7761309b4abff4",
+    measurementId: "G-VBFKZZRSQ7"
+};
+
+firebase.initializeApp(firebaseConfig);
+export const auth = firebase.auth();
+export const firestore = firebase.firestore();
 
 class Auth extends React.Component {
     constructor(props) {
@@ -65,7 +113,7 @@ class Auth extends React.Component {
                         placeholder={"Type in a username"}
                     />
                     <br />
-                    
+
                     <h3>Password</h3>
                     <input
                         key="password-input"
@@ -82,7 +130,7 @@ class Auth extends React.Component {
     }
 }
 
-export default Auth;
+export default Auth;*/
 
 /*<input
 key="username-input"
