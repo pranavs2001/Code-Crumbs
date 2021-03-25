@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "C:/Users/andre/Desktop/Developing/Code-Crumbs/codecrumbs-frontend/script/build.sh",
+    "build": ".\\script\\build.sh",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

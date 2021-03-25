@@ -16,5 +16,6 @@
   "background": {
     "scripts": ["background.js"],
     "persistent": false
-  }
+  },
+  "host_permissions": ["https://jotitdown.app/*"]
 }

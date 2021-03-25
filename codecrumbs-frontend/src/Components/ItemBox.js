@@ -32,7 +32,7 @@ export default class ItemBox extends Component {
             comment = <p className="commentBox">{this.props.comment}</p>
             className += 'content '
             
-        } else if (this.props.isCurrent) {
+        } else if (this.props.isCurrent && this.props.onCommentSubmit) {
             comment = 
             <form onSubmit={this.handleSubmit} style={{display: 'flex', flexDirection: 'row'}}>
                 <label style={{width: '100%'}}>
