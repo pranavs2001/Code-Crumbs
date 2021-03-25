@@ -1,10 +1,16 @@
+<<<<<<< HEAD
 /*global chrome*/
 import React from "react";
+=======
+    /*global chrome*/
+import React, { useState } from "react";
+>>>>>>> 8d216efa0580dfa5530e40171dae50011af92031
 import { Router, Link } from "@reach/router";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import ProfilePage from "./ProfilePage";
 import PasswordReset from "./PasswordReset";
+<<<<<<< HEAD
 import { UserContext, UserProvider } from './providers/UserProvider';
 
 function Authentication() {
@@ -19,6 +25,20 @@ function Authentication() {
     return (
         userId ?
             <ProfilePage />
+=======
+import MainPage from "../MainPage";
+
+function Authentication() {
+    const [userId, setUserId] = useState("")
+
+    chrome.storage.local.get(['userId'], function(result) {
+        setUserId(result.userId)
+    })
+
+    return (
+        userId ?
+            <MainPage/>
+>>>>>>> 8d216efa0580dfa5530e40171dae50011af92031
             :
             <div>
                 <nav>
@@ -32,6 +52,7 @@ function Authentication() {
                     <SignUp path="signUp" />
                     <SignIn path="/" />
                     <PasswordReset path="passwordReset" />
+                    <MainPage path="mainPage"/>
                 </Router>
             </div>
 
