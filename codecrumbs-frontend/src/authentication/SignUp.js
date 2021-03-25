@@ -1,3 +1,4 @@
+/*global chrome*/
 import React, { useState } from "react";
 import { Link } from "@reach/router";
 import { UserContext } from "./providers/UserProvider";
@@ -9,11 +10,21 @@ const SignUp = () => {
     const [displayName, setDisplayName] = useState("");
     const [error, setError] = useState(null);
 
-    const createUserWithEmailAndPasswordHandler = async (event, email, password) => {
+    const createUserWithEmailAndPasswordHandler = async (event, displayName, email, password) => {
         event.preventDefault();
         try {
             const { user } = await auth.createUserWithEmailAndPassword(email, password);
             generateUserDocument(user, { displayName });
+            //store locally in Chrome
+            chrome.storage.local.set({ 'userId': user.uid }, function () {
+                console.log('Value is set to ' + user.uid);
+            });
+            /*chrome.storage.local.set({ 'email': email }, function () {
+                console.log('Value is set to ' + email);
+            });
+            chrome.storage.local.set({ 'password': password }, function () {
+                console.log('Value is set to ' + password);
+            });*/
         }
         catch (error) {
             setError('Error Signing up with email and password');
@@ -85,7 +96,7 @@ const SignUp = () => {
                         className="bg-green-400 hover:bg-green-500 w-full py-2 text-white"
                         color="#a10505"
                         onClick={event => {
-                            createUserWithEmailAndPasswordHandler(event, email, password);
+                            createUserWithEmailAndPasswordHandler(event, displayName, email, password);
                         }}
                     >
                         Sign up

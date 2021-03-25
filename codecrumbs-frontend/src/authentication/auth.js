@@ -1,20 +1,31 @@
+/*global chrome*/
 import React from "react";
 import { Router, Link } from "@reach/router";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import ProfilePage from "./ProfilePage";
 import PasswordReset from "./PasswordReset";
+import { UserContext, UserProvider } from './providers/UserProvider';
 
 function Authentication() {
-    const user = null;
+    var user = null;
+
+    chrome.storage.local.get(['userId'], function (result) {
+        console.log('Value currently is ' + result.key);
+
+        userId = result.key.uid;
+    });
+
     return (
-        user ?
+        userId ?
             <ProfilePage />
             :
             <div>
                 <nav>
                     <Link to="/">Sign In</Link>
+                    <br />
                     <Link to="signUp">Sign Up</Link>
+                    <br />
                     <Link to="passwordReset">Reset Password</Link>
                 </nav>
                 <Router>
@@ -28,6 +39,19 @@ function Authentication() {
 }
 
 export default Authentication;
+
+
+/*<nav>
+                    <Link to="/">Sign In</Link>
+                    <Link to="signUp">Sign Up</Link>
+                    <Link to="passwordReset">Reset Password</Link>
+                </nav>
+                <Router>
+                    <SignUp path="signUp" />
+                    <SignIn path="/" />
+                    <PasswordReset path="passwordReset" />
+                </Router>*/
+
 
 /*import React from 'react';
 import ReactDOM from 'react-dom';
