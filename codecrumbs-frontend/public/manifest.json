@@ -17,5 +17,5 @@
     "scripts": ["background.js"],
     "persistent": false
   },
-  "host_permissions": ["https://jotitdown.app/*"]
+  "host_permissions": ["codecrumbs.uc.r.appspot.com/*"]
 }
