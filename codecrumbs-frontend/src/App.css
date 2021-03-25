@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  padding: 24px
 }
 
 .App-logo {
@@ -26,6 +27,104 @@
 
 .App-link {
   color: #61dafb;
+}
+
+/* Component CSS Stylings */
+.itemBox {
+  background-color: #E6E6E6;
+  width: 352px;
+  height: fit-content;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+}
+
+.itemBox.content {
+  height: fit-content;
+}
+
+.itemBox.current {
+  background-color: #FFA852;
+}
+
+.itemBoxContent {
+  display: flex;
+  justify-content: left;
+  margin-bottom: 8px;
+}
+
+.commentBox {
+  text-align: left;
+  background-color: #FFFFFF;  
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.iconBox {
+  margin-left: 8px;
+}
+
+.current .commentBox {
+  color: rgba(255, 168, 82, 0.40);
+}
+
+.current .extensionH2 {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.itemBox p {
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+.imagePlaceholder {
+  height: 20px;
+  width: 20px;
+  background-color: #61dafb;
+  border-radius: 6px;
+}
+
+/* General Stylings */
+
+p {
+  text-align: left;
+}
+
+h1 {
+  font-family: "Roboto";
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  color: #000000;
+  opacity: 0.87;
+}
+
+.extensionH2 {
+  font-family: "Roboto";
+  font-size: 12px;
+  font-weight: bold;
+  text-align: left;
+  color: #000000;
+  opacity: 0.87;
+}
+
+.extensionBody {
+  font-family: "Roboto";
+  font-size: 8px;
+  font-weight: bold;
+  text-align: left;
+  color: #000000;
+  opacity: 0.60;
+}
+
+input {
+  width: 331px;
+  height: 20px;
+  border-radius: 6px;
+  border-width: 0px;
+  padding-left: 8px;
+  font-family: "Roboto";
+  font-size: 10px;
 }
 
 @keyframes App-logo-spin {

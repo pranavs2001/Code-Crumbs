@@ -7,11 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class ProjectUser {
+    private String projectName;
     private String userId;
-
-    private String name;
-    private String email;
-    private String occupation;
-    private String githubAccessToken;
 }
