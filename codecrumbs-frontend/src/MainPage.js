@@ -11,18 +11,16 @@ export default function MainPage () {
 
     console.log("REFRESHED")
 
-    // setChromeTrackingState(isTracking)
     chrome.storage.local.get(['isTracking'], function(result) {
-        console.log(`IS TRACKING: ${result.isTracking}`)
-        if(isTracking === undefined && result.isTracking !== undefined) {
-            console.log("setting tracking to ", isTracking)
+        // console.log(`IS TRACKING: ${result.isTracking}`)
+        if(isTracking === undefined && result && result.isTracking !== undefined) {
+            console.log("setting tracking to ", result.isTracking)
             setTrackingState(result.isTracking)
         }
     })
 
-    // setChromeCurrentTrack(currentTrack)
     chrome.storage.local.get(['currentTrack'], function(result) {
-        console.log(`TRACKING STATE: ${result.currentTrack}`)
+        // console.log(`TRACKING STATE: ${result.currentTrack}`)
         if(currentTrack === undefined && result.currentTrack) {
             setCurrentTrack(result.currentTrack)
         }
@@ -78,9 +76,9 @@ export default function MainPage () {
     }
 
     function trackingButtonClicked() {
-        console.log("Tracking state toggled")
+        console.log(`Tracking state ${isTracking} -> ${!isTracking}`)
+        setChromeTrackingState(!isTracking)
         setTrackingState(!isTracking)
-        // setChromeTrackingState(isTracking)
     }
 
     return (
