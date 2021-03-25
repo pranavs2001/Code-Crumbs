@@ -9,7 +9,6 @@ public class Utils {
     public static final String TIME_ACCESSED = "timeAccessed";
     public static final String COMMENTS = "comments";
     public static final String STARRED = "starred";
-    public static final String COMMIT_ID = "commitId";
 
     public static final String RESPONSES = "responses";
     public static final String TEXT_ANNOTATIONS = "textAnnotations";

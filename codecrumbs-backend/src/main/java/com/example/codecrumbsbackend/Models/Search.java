@@ -19,5 +19,4 @@ public class Search {
 
     //Only required if it is starred
     private boolean starred;
-    private String commitId;
 }
