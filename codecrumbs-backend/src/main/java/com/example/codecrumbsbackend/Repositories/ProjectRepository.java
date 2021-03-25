@@ -85,6 +85,27 @@ public class ProjectRepository {
         return new Project();
     }
 
+    public List<Project> getAllProjects(String userId) {
+        List<Project> toReturn = new ArrayList<>();
+        try {
+            CollectionReference collectionReference = firebaseService.getDb()
+                    .collection(Utils.USERS)
+                    .document(userId)
+                    .collection(Utils.PROJECTS);
+
+            ApiFuture<QuerySnapshot> collectionFuture = collectionReference.get();
+            List<QueryDocumentSnapshot> docs = collectionFuture.get().getDocuments();
+
+            for (QueryDocumentSnapshot snap : docs) {
+                toReturn.add(snap.toObject(Project.class));
+            }
+        }
+        catch (InterruptedException | ExecutionException | NullPointerException e) {
+            return new ArrayList<>();
+        }
+            return toReturn;
+    }
+
     public Search addNewSearch(Search search) {
         try {
             CollectionReference collectionReference = firebaseService.getDb()

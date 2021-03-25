@@ -20,16 +20,22 @@ public class ProjectController {
     ProjectRepository projectRepository;
 
     //BASIC INFO
-    @ApiOperation(value = "Creates new project -- REQUIRED: active (default true), associatedUserId, name, numberOfSearches (default 0)")
+    @ApiOperation(value = "Creates new project -- REQUIRED: associatedUserId, name, numberOfSearches (default 0)")
     @PostMapping("/new-project")
     public Project postNewProject(@RequestBody Project project) {
         return projectRepository.postNewProject(project);
     }
 
     @ApiOperation(value = "Get project info by name -- REQUIRED: projectName, userId")
-    @PostMapping("/project-by-name")
+    @GetMapping("/project-by-name")
     public Project getProjectByName(@RequestBody ProjectUser projectUser) {
         return projectRepository.getProjectByName(projectUser);
+    }
+
+    @ApiOperation(value = "Get all projects -- REQUIRED: Path variable userId")
+    @GetMapping("/all-projects/{userId}")
+    public List<Project> getAllProjects(@PathVariable("userId") String userId) {
+        return projectRepository.getAllProjects(userId);
     }
 
     //SEARCH HISTORY
@@ -39,7 +45,7 @@ public class ProjectController {
         return projectRepository.addNewSearch(search);
     }
 
-    @ApiOperation(value = "Returns specified number of most recent searches -- REQUIRED: associatedSearchId, limit, projectUser")
+    @ApiOperation(value = "Returns specified number of most recent searches -- REQUIRED: limit, projectUser")
     @GetMapping("/most-recent-limited-searches")
     public List<Search> getMostRecentSearchesLimited(@RequestBody Limit limit) {
         return projectRepository.getMostRecentSearchesLimited(limit.getLimit(), limit.getProjectUser());
