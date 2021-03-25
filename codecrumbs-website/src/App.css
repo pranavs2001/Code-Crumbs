@@ -1,0 +1,31 @@
+.AbsPos {
+  position: absolute;
+}
+
+.TopLeft {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+}
+
+.FullWidthHeight {
+  width: 100%;
+  height: 100%;
+}
+
+.App {
+  background-color: lightgray;
+}
+
+.Header {
+  height: 10%;
+  background-color: gray;
+}
+
+.Logo {
+  left: 5%;
+  height: 5%;
+  width: 20%;
+  height: 90%;
+  background-color: black;
+}
