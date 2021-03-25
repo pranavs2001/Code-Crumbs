@@ -1,1 +1,3 @@
 codecrumbs-backend/src/main/resources/
+manifest.json
+/codecrumbs-frontend/dist/popup.html

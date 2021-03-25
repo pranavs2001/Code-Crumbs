@@ -1,15 +1,22 @@
-import React from "react";
+    /*global chrome*/
+import React, { useState } from "react";
 import { Router, Link } from "@reach/router";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import ProfilePage from "./ProfilePage";
 import PasswordReset from "./PasswordReset";
+import MainPage from "../MainPage";
 
 function Authentication() {
-    const user = null;
+    const [userId, setUserId] = useState("")
+
+    chrome.storage.local.get(['userId'], function(result) {
+        setUserId(result.userId)
+    })
+
     return (
-        user ?
-            <ProfilePage />
+        userId ?
+            <MainPage/>
             :
             <div>
                 <nav>
@@ -21,6 +28,7 @@ function Authentication() {
                     <SignUp path="signUp" />
                     <SignIn path="/" />
                     <PasswordReset path="passwordReset" />
+                    <MainPage path="mainPage"/>
                 </Router>
             </div>
 

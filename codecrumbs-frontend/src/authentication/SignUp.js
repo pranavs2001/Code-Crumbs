@@ -1,3 +1,4 @@
+    /*global chrome*/
 import React, { useState } from "react";
 import { Link } from "@reach/router";
 import { UserContext } from "./providers/UserProvider";
@@ -14,6 +15,10 @@ const SignUp = () => {
         try {
             const { user } = await auth.createUserWithEmailAndPassword(email, password);
             generateUserDocument(user, { displayName });
+
+            chrome.storage.local.set({'userId': user.uid}, function() {
+                console.log('Value is set to ' + user.uid);
+              });
         }
         catch (error) {
             setError('Error Signing up with email and password');

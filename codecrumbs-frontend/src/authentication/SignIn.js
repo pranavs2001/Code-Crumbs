@@ -1,3 +1,4 @@
+    /*global chrome*/
 import React, { useState } from "react";
 import { Link } from "@reach/router";
 import { UserContext } from "./providers/UserProvider";
@@ -10,7 +11,15 @@ const SignIn = () => {
 
     const signInWithEmailAndPasswordHandler = (event, email, password) => {
         event.preventDefault();
-        auth.signInWithEmailAndPassword(email, password).catch(error => {
+        auth.signInWithEmailAndPassword(email, password).then((userCredential) => {
+            var userId = userCredential.user.uid
+            // SUCESSFUL LOGIN
+            
+            chrome.storage.local.set({'userId': userId}, function() {
+                console.log('Value is set to ' + userId);
+              });
+
+        }).catch(error => {
             setError("Error signing in with password and email!");
             console.error("Error signing in with password and email", error);
         });
