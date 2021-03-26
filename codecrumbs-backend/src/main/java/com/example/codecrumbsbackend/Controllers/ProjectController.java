@@ -1,9 +1,6 @@
 package com.example.codecrumbsbackend.Controllers;
 
-import com.example.codecrumbsbackend.Models.Limit;
-import com.example.codecrumbsbackend.Models.Project;
-import com.example.codecrumbsbackend.Models.ProjectUser;
-import com.example.codecrumbsbackend.Models.Search;
+import com.example.codecrumbsbackend.Models.*;
 import com.example.codecrumbsbackend.Repositories.ProjectRepository;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -39,26 +36,32 @@ public class ProjectController {
     }
 
     //SEARCH HISTORY
-    @ApiOperation(value = "Creates new search -- REQUIRED: associatedProjectName, associatedUserId, websiteName, websiteUrl")
+    @ApiOperation(value = "Creates new search -- REQUIRED: associatedProjectName, associatedUserId, websiteName, websiteUrl, imageUrl")
     @PostMapping("/new-search")
     public Search addNewSearch(@RequestBody Search search) {
         return projectRepository.addNewSearch(search);
     }
 
+    @ApiOperation(value = "Returns buzzwords (tags) NLP -- REQUIRED: websiteUrl")
+    @PostMapping("/buzzwords")
+    public List<String> nlpText(@RequestBody WebsiteUrl websiteUrl) {
+        return projectRepository.nlpText(websiteUrl.getWebsiteUrl());
+    }
+
     @ApiOperation(value = "Returns specified number of most recent searches -- REQUIRED: limit, projectUser")
-    @GetMapping("/most-recent-limited-searches")
+    @PostMapping("/most-recent-limited-searches")
     public List<Search> getMostRecentSearchesLimited(@RequestBody Limit limit) {
         return projectRepository.getMostRecentSearchesLimited(limit.getLimit(), limit.getProjectUser());
     }
 
-    @ApiOperation(value = "Toggles search as starred or unstarred -- REQUIRED: associatedProjectName, associatedUserId, starred, websiteId")
+    @ApiOperation(value = "Toggles search as starred or unstarred -- REQUIRED: associatedProjectName, associatedUserId, starred, searchId")
     @PutMapping("/star-search") //can either set starred to true or false
-    public Search starSearch(@RequestBody Search search) { //only websiteId (searchId), associatedUserId, and associatedProjectName, starred
+    public Search starSearch(@RequestBody Search search) {
         return projectRepository.starSearch(search);
     }
     //Add filtering keywords to filter search history
 
-    @ApiOperation(value = "Deletes search entry -- REQUIRED: associatedProjectName, associatedUserId, websiteId")
+    @ApiOperation(value = "Deletes search entry -- REQUIRED: associatedProjectName, associatedUserId, searchId")
     @DeleteMapping("/delete-search")
     public Search deleteSearch(@RequestBody Search search) {
         return projectRepository.deleteSearch(search);

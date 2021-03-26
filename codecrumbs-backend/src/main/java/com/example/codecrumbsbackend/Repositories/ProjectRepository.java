@@ -14,6 +14,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.tomcat.util.json.JSONParser;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,22 +127,9 @@ public class ProjectRepository {
 
             DocumentReference newDoc = collectionReference.document();
 
-            String websiteId = newDoc.getId();
-            search.setWebsiteId(websiteId);
+            String searchId = newDoc.getId();
+            search.setSearchId(searchId);
             newDoc.set(search, SetOptions.merge());
-
-            //SCREENSHOT THE URL
-            String screenshotUrl = takeScreenshot(search.getWebsiteUrl());
-            if (screenshotUrl == null)
-                throw new NullPointerException();
-            //EXTRACT THE TEXT
-            String textracted = textract("gs://website-screenshots-hacks/" + screenshotUrl);
-            if (textracted == null)
-                throw new NullPointerException();
-
-            //FIND BUZZWORDS
-
-
 
             //Increment Number of Searches
             int numOfSearches = getProjectByName(new ProjectUser(search.getAssociatedProjectName(), search.getAssociatedUserId())).getNumberOfSearches();
@@ -153,10 +141,32 @@ public class ProjectRepository {
             documentReference.update(Utils.NUMBER_OF_SEARCHES, numOfSearches + 1);
 
         }
-        catch (NullPointerException | IOException | JSONException e) {
+        catch (NullPointerException e) {
             return new Search();
         }
         return search;
+    }
+
+    public List<String> nlpText(String websiteUrl) {
+        List<String> toReturn = new ArrayList<>();
+        try {
+            //SCREENSHOT THE URL
+            String screenshotUrl = takeScreenshot(websiteUrl);
+            if (screenshotUrl == null)
+                throw new NullPointerException();
+            //EXTRACT THE TEXT
+            String textracted = textract("gs://website-screenshots-hacks/" + screenshotUrl);
+            if (textracted == null)
+                throw new NullPointerException();
+
+            //FIND BUZZWORDS
+            textracted = textracted.replaceAll("\n", " ");
+            toReturn = saliencyAnalysis(textracted);
+        }
+        catch (NullPointerException | IOException | JSONException e) {
+            return new ArrayList<>();
+        }
+        return toReturn;
     }
 
     public List<Search> getMostRecentSearchesLimited(int limit, ProjectUser projectUser) {
@@ -191,7 +201,7 @@ public class ProjectRepository {
                     .collection(Utils.PROJECTS)
                     .document(search.getAssociatedProjectName())
                     .collection(Utils.SEARCHES)
-                    .document(search.getWebsiteId());
+                    .document(search.getSearchId());
 
             documentReference.update(Utils.STARRED, search.isStarred());
         } catch (NullPointerException e) {
@@ -207,7 +217,7 @@ public class ProjectRepository {
                 .collection(Utils.PROJECTS)
                 .document(search.getAssociatedProjectName())
                 .collection(Utils.SEARCHES)
-                .document(search.getWebsiteId()).delete();
+                .document(search.getSearchId()).delete();
         return search;
     }
 
@@ -272,5 +282,39 @@ public class ProjectRepository {
         JSONObject json = new JSONObject(builder.toString());
 
         return json.getJSONArray(Utils.RESPONSES).getJSONObject(0).getJSONArray(Utils.TEXT_ANNOTATIONS).getJSONObject(0).getString(Utils.DESCRIPTION);
+    }
+
+    private List<String> saliencyAnalysis(String textracted) throws IOException, JSONException {
+        String payload = "{ \"document\":{\"type\":\"PLAIN_TEXT\",\"content\":\"" + textracted.replaceAll("\"", "") + "\"},\"encodingType\":\"UTF8\"}";
+        StringEntity entity = new StringEntity(payload,
+                ContentType.APPLICATION_JSON);
+
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost request = new HttpPost(Utils.SALIENCY_URL + Secrets.TEXTRACT_KEY);
+        request.setEntity(entity);
+
+        HttpResponse response = httpClient.execute(request);
+
+        if (response.getStatusLine().getStatusCode() != 200)
+            return null;
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+        StringBuilder builder = new StringBuilder();
+        for (String line = null; (line = reader.readLine()) != null;) {
+            builder.append(line).append("\n");
+        }
+
+        JSONObject json = new JSONObject(builder.toString());
+
+        JSONArray arr = json.getJSONArray(Utils.ENTITIES);
+
+        List<String> toReturn = new ArrayList<>();
+
+        for (int i = 0; i < arr.length() && i < 3; i++) {
+            JSONObject obj = arr.getJSONObject(i);
+            String str = obj.getString(Utils.NAME); //they are already sorted by salience, possibly omit some words like "SIGN IN" etc. (filter)
+            toReturn.add(str);
+        }
+        return toReturn;
     }
 }

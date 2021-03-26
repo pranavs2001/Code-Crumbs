@@ -13,9 +13,12 @@ public class Utils {
     public static final String RESPONSES = "responses";
     public static final String TEXT_ANNOTATIONS = "textAnnotations";
     public static final String DESCRIPTION = "description";
+    public static final String ENTITIES = "entities";
+    public static final String NAME = "name";
 
     public static final String SCREENSHOT_URL = "https://us-central1-codecrumbs.cloudfunctions.net/website-screenshot";
     public static final String TEXTRACT_URL = "https://vision.googleapis.com/v1/images:annotate?key=";
+    public static final String SALIENCY_URL = "https://language.googleapis.com/v1/documents:analyzeEntities?key=";
 
     public static final String STATUS = "Status";
     public static final String SUCCESS = "Success";

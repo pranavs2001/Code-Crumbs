@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Search {
-    private String websiteId;
+    private String searchId;
 
     private String associatedUserId;
     private String associatedProjectName;
@@ -16,6 +16,7 @@ public class Search {
     private String websiteUrl;
     private String timeAccessed;
     private String timeAccessedFormat;
+    private String imageUrl;
 
     //Only required if it is starred
     private boolean starred;
