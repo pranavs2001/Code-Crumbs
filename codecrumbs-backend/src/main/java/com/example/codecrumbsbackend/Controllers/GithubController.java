@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
+import java.io.StringWriter;
+
 import com.google.gson.*;
+import com.google.protobuf.MapEntry;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,9 +16,11 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.StringJoiner;
 
 import javax.print.attribute.HashAttributeSet;
@@ -34,15 +38,28 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.api.client.json.Json;
 import com.google.common.base.Optional;
+import com.google.common.collect.Multiset.Entry;
+import com.google.common.io.CharStreams;
 
 import lombok.Getter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.http.*;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.web.bind.annotation.*;
+
+import io.netty.handler.codec.base64.Base64Encoder;
 
 @RestController
 @Slf4j
@@ -107,7 +124,7 @@ public class GithubController implements ErrorController {
         HashMap<String, String> returnMap = new HashMap<>();
         try {
             Map<String, String> temp = new HashMap<>();
-            temp.put(Utils.ACCESS_TOKEN, accessToken.getAccessToken());
+            temp.put(Utils.ACCESS_TOKEN_DATABASE_KEY, accessToken.getAccessToken());
             Map<String, Object> finalParams = new HashMap<>(temp);
 
             userRepository.setUserField(accessToken.getUserId(), finalParams);
@@ -132,7 +149,7 @@ public class GithubController implements ErrorController {
             String[] values = {accessToken, Utils.ALL, Utils.FULL_NAME, Utils.HUNDRED};
             Map<String, String> paramMap = parameterMap(keys, values);
 
-            String finalResponse = postHelper(urlResource, paramMap);
+            String finalResponse = getHelper(urlResource, paramMap);
 
             if(errorCheck(finalResponse)) {
                 objNode.put(Utils.STATUS, finalResponse);
@@ -146,7 +163,7 @@ public class GithubController implements ErrorController {
                     tempJson.put(Utils.OWNER, owner.get(Utils.LOGIN).getAsString());
                     tempJson.put(Utils.REPO_NAME, temp.get(Utils.REPO_NAME).getAsString());
 
-                    String[] tempUrlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[0] + "/", tempJson.get(Utils.OWNER) + "/", tempJson.get(Utils.REPO_NAME) + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1]};
+                    String[] tempUrlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1] + "/", (tempJson.get(Utils.OWNER) + "/").replace("\"", ""), (tempJson.get(Utils.REPO_NAME) + "/").replace("\"", ""), Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[2]};
                     urlResource = urlFormatter(tempUrlElems);
 
                     String[] keysTemp = {Utils.PER_PAGE, Utils.ACCESS_TOKEN};
@@ -154,18 +171,16 @@ public class GithubController implements ErrorController {
                     paramMap.clear();
                     paramMap = parameterMap(keysTemp, valuesTemp);
 
-                    finalResponse = postHelper(urlResource, paramMap);
-
+                    finalResponse = getHelper(urlResource, paramMap);
                     if(errorCheck(finalResponse)) {
                         continue;
                     }
-
                     JsonArray jsonCollaborators = JsonParser.parseString(finalResponse).getAsJsonArray();
                     int j;
                     ObjectNode collaboratorsArr = mapper.createObjectNode();
                     for(j = 0; j < jsonCollaborators.size(); j++) {
                         ObjectNode tempCollaboratorsJson = mapper.createObjectNode();
-                        JsonObject tempCollaborator = jsonCollaborators.get(i).getAsJsonObject();
+                        JsonObject tempCollaborator = jsonCollaborators.get(j).getAsJsonObject();
                         tempCollaboratorsJson.put(Utils.LOGIN, tempCollaborator.get(Utils.LOGIN).getAsString());
 
                         collaboratorsArr.set(Integer.toString(j), tempCollaboratorsJson);
@@ -200,7 +215,7 @@ public class GithubController implements ErrorController {
             String[] values = {accessToken, Utils.HUNDRED};
             Map<String, String> paramMap = parameterMap(keys, values);
 
-            String finalResponse = postHelper(urlResource, paramMap);
+            String finalResponse = getHelper(urlResource, paramMap);
 
             if(errorCheck(finalResponse)) {
                 objNode.put(Utils.STATUS, finalResponse);
@@ -231,7 +246,7 @@ public class GithubController implements ErrorController {
         ObjectNode objNode = mapper.createObjectNode();
 
         try {
-            String accessToken = userRepository.getUserInfo(commit.getUserId()).getGithubAccessToken();
+            String accessToken = "0fa671f4c0033ee7cde1527d502e92cbce13ddcd"; //userRepository.getUserInfo(commit.getUserId()).getGithubAccessToken();
             String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[0] + "/", commit.getOwner() + "/", commit.getRepo() + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[1]};
             String urlResource = urlFormatter(urlElems);
 
@@ -239,7 +254,7 @@ public class GithubController implements ErrorController {
             String[] values = {accessToken, commit.getSince()};
             Map<String, String> paramMap = parameterMap(keys, values);
 
-            String finalResponse = postHelper(urlResource, paramMap);
+            String finalResponse = getHelper(urlResource, paramMap);
 
             JsonArray jsonobj = JsonParser.parseString(finalResponse).getAsJsonArray();
 
@@ -269,37 +284,57 @@ public class GithubController implements ErrorController {
 
     private String postHelper(String urlResource, Map<String, String> paramMap) {
         try {
-            URL url = new URL(urlResource);
-            HttpURLConnection post = (HttpURLConnection)url.openConnection();
-            post.setRequestMethod("POST");
-            post.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-            post.setRequestProperty("Accept", "application/json");
-            post.setDoOutput(true);
-
-            StringJoiner s = new StringJoiner("&");
-            for(Map.Entry<String, String> temp : paramMap.entrySet()) {
-                s.add(URLEncoder.encode(temp.getKey(), "UTF-8") + "=" + URLEncoder.encode(temp.getValue(), "UTF-8"));
-            }
-
-            byte[] output = s.toString().getBytes(StandardCharsets.UTF_8);
-            post.setFixedLengthStreamingMode(output.length);
-            post.connect();
-
-            try(OutputStream os = post.getOutputStream()) {
-                os.write(output);
-            }
-
-            try(BufferedReader bf = new BufferedReader(new InputStreamReader(post.getInputStream(), "utf-8"))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine = null;
-                while ((responseLine = bf.readLine()) != null) {
-                    response.append(responseLine.trim());
+            HttpClient httpclient = HttpClients.createDefault();
+            HttpPost httppost = new HttpPost(urlResource);
+            List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+            for(Map.Entry<String,String> entry : paramMap.entrySet()) {
+                if(entry.getKey() != Utils.ACCESS_TOKEN) {
+                    params.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+                } else {
+                    httppost.setHeader(HttpHeaders.AUTHORIZATION, "token " + entry.getValue());
                 }
-                String finalResponse = response.toString();
-                return finalResponse;
+            }
+
+            httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+            
+            HttpResponse responseVal = httpclient.execute(httppost);
+            HttpEntity entity = responseVal.getEntity();
+
+            if (entity != null) {
+                try (InputStream instream = entity.getContent()) {
+                    String result = CharStreams.toString(new InputStreamReader(instream, StandardCharsets.UTF_8));
+                    return result;
+                }
+            } else {
+                throw new Exception();
             }
         } catch (Exception e) {
-            return Utils.ERROR + e.getLocalizedMessage();
+            return Utils.ERROR + ": " + e.getLocalizedMessage();
+        }
+    }
+
+    private String getHelper(String urlResource, Map<String, String> paramMap) {
+        try {
+            HttpClient httpclient = HttpClients.createDefault();
+            urlResource += "?";
+            for(Map.Entry<String, String> elem : paramMap.entrySet()) {
+                if(elem.getKey() != Utils.ACCESS_TOKEN) {
+                    urlResource += elem.getKey() + "=" + elem.getValue() + "&";
+                }
+            }
+            urlResource = urlResource.substring(0, urlResource.length() - 1);
+            HttpGet httpget = new HttpGet(urlResource);
+            httpget.setHeader(HttpHeaders.AUTHORIZATION, "token " + paramMap.get(Utils.ACCESS_TOKEN));
+            HttpResponse httpresponse = httpclient.execute(httpget);
+            Scanner sc = new Scanner(httpresponse.getEntity().getContent());
+            String finalResponse = "";
+            while(sc.hasNext()) {
+                finalResponse += sc.nextLine();
+            }
+            sc.close();
+            return finalResponse;
+        } catch (Exception e) {
+            return Utils.ERROR + ": " + e.getLocalizedMessage();
         }
     }
 

@@ -23,6 +23,7 @@ public class Utils {
     public static final String STATUS = "Status";
     public static final String SUCCESS = "Success";
     public static final String ACCESS_TOKEN = "access_token";
+    public static final String ACCESS_TOKEN_DATABASE_KEY = "githubAccessToken";
     public static final String VISIBILITY = "visibility";
     public static final String SORT = "sort";
     public static final String PER_PAGE = "per_page";
