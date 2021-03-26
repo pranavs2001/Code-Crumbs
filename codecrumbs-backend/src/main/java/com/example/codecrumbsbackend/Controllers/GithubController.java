@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import com.google.gson.*;
 import com.google.protobuf.MapEntry;
 
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -284,29 +285,33 @@ public class GithubController implements ErrorController {
 
     private String postHelper(String urlResource, Map<String, String> paramMap) {
         try {
-            HttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost = new HttpPost(urlResource);
-            List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-            for(Map.Entry<String,String> entry : paramMap.entrySet()) {
-                if(entry.getKey() != Utils.ACCESS_TOKEN) {
-                    params.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-                } else {
-                    httppost.setHeader(HttpHeaders.AUTHORIZATION, "token " + entry.getValue());
-                }
+            URL url = new URL(urlResource);
+            HttpURLConnection post = (HttpURLConnection)url.openConnection();
+            post.setRequestMethod("POST");
+            post.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            post.setRequestProperty("Accept", "application/json");
+            post.setDoOutput(true);
+
+            StringJoiner s = new StringJoiner("&");
+            for(Map.Entry<String, String> temp : paramMap.entrySet()) {
+                s.add(URLEncoder.encode(temp.getKey(), "UTF-8") + "=" + URLEncoder.encode(temp.getValue(), "UTF-8"));
+            }
+            byte[] output = s.toString().getBytes(StandardCharsets.UTF_8);
+            post.setFixedLengthStreamingMode(output.length);
+            post.connect();
+
+            try(OutputStream os = post.getOutputStream()) {
+                os.write(output);
             }
 
-            httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-            
-            HttpResponse responseVal = httpclient.execute(httppost);
-            HttpEntity entity = responseVal.getEntity();
-
-            if (entity != null) {
-                try (InputStream instream = entity.getContent()) {
-                    String result = CharStreams.toString(new InputStreamReader(instream, StandardCharsets.UTF_8));
-                    return result;
+            try(BufferedReader bf = new BufferedReader(new InputStreamReader(post.getInputStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine = null;
+                while ((responseLine = bf.readLine()) != null) {
+                    response.append(responseLine.trim());
                 }
-            } else {
-                throw new Exception();
+                String finalResponse = response.toString();
+                return finalResponse;
             }
         } catch (Exception e) {
             return Utils.ERROR + ": " + e.getLocalizedMessage();
