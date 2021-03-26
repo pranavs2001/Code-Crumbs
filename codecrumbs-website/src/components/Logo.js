@@ -1,6 +1,6 @@
 function Logo(props) {
     return (
-        <img src={props.imageLocation} className="AbsPos Logo" />
+        <img src={props.imagePath} className="AbsPos Logo" alt='' />
     );
 }
 

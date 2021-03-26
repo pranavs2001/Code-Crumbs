@@ -1,3 +1,8 @@
+:root {
+  --brandColor: rgb(241, 155, 72);
+  --lighterGray: rgb(236, 236, 236);
+}
+
 .AbsPos {
   position: absolute;
 }
@@ -8,24 +13,67 @@
   left: 0%;
 }
 
+.TextCenter {
+  text-align: center;
+}
+
 .FullWidthHeight {
   width: 100%;
   height: 100%;
 }
 
 .App {
-  background-color: lightgray;
+  background-color: var(--lighterGray);
 }
 
 .Header {
   height: 10%;
-  background-color: gray;
+  background-color: white;
 }
 
 .Logo {
   left: 5%;
-  height: 5%;
-  width: 20%;
-  height: 90%;
-  background-color: black;
+  top: 20%;
+  width: auto;
+  height: 60%;
+  cursor: pointer;
+}
+
+.Button {
+  top: 30%;
+  height: 40%;
+  width: 10%;
+  border-radius: 10px;
+  border: solid 2px var(--brandColor);
+  cursor: pointer;
+  line-height: 4vh;
+}
+
+.Button-Selected {
+  background-color: rgb(241, 155, 72);
+  color: white;
+}
+
+.Button-Unselected {
+  background-color: transparent;
+  color: var(--brandColor);
+}
+
+.Timeline {
+  display: block;
+  width: 35%;
+  top: 12%;
+  height: 86%;
+  background-color: gray;
+}
+
+.Timeline-Hidden {
+  display: none;
+}
+
+.TimelineElement {
+  left: 5%;
+  width: 90%;
+  height: 17%;
+  background-color: var(--lighterGray);
 }
