@@ -8,24 +8,35 @@ export default function MainPage () {
     const [currentTrack, setCurrentTrack] = useState(undefined)
     const [isTracking, setTrackingState] = useState(undefined)
     const [projects, setProjects] = useState(undefined)
+    const [searches, setSearches] = useState(undefined)
+    var userId
 
-    console.log("REFRESHED")
-
+    // Getting information stored locally in chrome
     chrome.storage.local.get(['isTracking'], function(result) {
-        // console.log(`IS TRACKING: ${result.isTracking}`)
         if(isTracking === undefined && result && result.isTracking !== undefined) {
-            console.log("setting tracking to ", result.isTracking)
             setTrackingState(result.isTracking)
         }
     })
 
     chrome.storage.local.get(['currentTrack'], function(result) {
-        // console.log(`TRACKING STATE: ${result.currentTrack}`)
-        if(currentTrack === undefined && result.currentTrack) {
+        if(currentTrack === undefined && result && result.currentTrack) {
             setCurrentTrack(result.currentTrack)
         }
     })
 
+    chrome.storage.local.get(['userId'], function(result) {
+        console.log(`UserID: ${result.userId}`)
+        if(result && result.userId) {
+            userId = result.userId
+        }
+    })
+
+    // TEMP solution to weird loading times
+    if (!searches) {
+        setTimeout(fetchSearches, 500)
+    }
+    
+    // POPULATING THE ELEMENTS
     var title
     var divider1
     var divider2
@@ -37,14 +48,16 @@ export default function MainPage () {
         divider1 = "Current Project"
         divider2 = "Other Projects"
 
-        if(projects) {
-            bottomContent = projects.map(project => <div id={project.name} onClick={() => projectClicked(project.name)}><ItemBox title={project.name}/></div>)
-        }
-
         if(currentTrack) {
-            currentElement = <ItemBox title={currentTrack} onCommentSubmit={isChangingProject ? undefined : handleChange} isCurrent/>
+            currentElement = <ItemBox title={currentTrack} isCurrent/>
         } else {
             currentElement = <div>Select a current project</div>
+        }
+
+        if(projects) {
+            bottomContent = projects.map(project => <div id={project.name} onClick={() => projectClicked(project.name)}><ItemBox title={project.name}/></div>)
+        } else {
+            bottomContent = <div>No projects yet...</div>
         }
 
     } else {
@@ -52,16 +65,29 @@ export default function MainPage () {
         divider1 = "Current Search"
         divider2 = "Latest Searches"
 
-        currentElement = <ItemBox title={currentURL} onCommentSubmit={isChangingProject ? undefined : handleChange} isCurrent/>
+        if(isTracking) {
+            currentElement = <ItemBox title={currentURL} onCommentSubmit={isChangingProject ? undefined : handleChange} isCurrent/>
+        } else {
+            currentElement = <div style={{width: '352px'}}>Not tracking current site</div>
+        }
 
+        console.log(searches)
+        if(searches) {
+            bottomContent = searches.map(search => <div id={search.websiteUrl}><ItemBox title={search.websiteUrl}/></div>)
+        } else {
+            bottomContent = <div style={{width: '352px'}}>No content yet...</div>
+            bottomContent = <div style={{width: '352px'}}>{currentTrack ? "Fetching recent tracks" : "Select project to see tracking history"}</div>
+        }
     }
 
+    // Getting the current tab for display
     chrome.tabs.getSelected(null, (tab) => {
         setCurrentURL(tab.url)
     })
 
+    // Clicked Functions
     function changeProjectClicked() {
-        fetch("https://codecrumbs.uc.r.appspot.com/all-projects/"+"tmFhMEwwCIf6E9lcwqnghBUN79g1")
+        fetch("https://codecrumbs.uc.r.appspot.com/all-projects/"+userId)
         .then( res => res.json())
         .then( data => {
             setProjects(data) 
@@ -73,12 +99,33 @@ export default function MainPage () {
         console.log("project clicked: " + name)
         setChromeCurrentTrack(name)
         setCurrentTrack(name)
+        setSearches(undefined)
     }
 
     function trackingButtonClicked() {
         console.log(`Tracking state ${isTracking} -> ${!isTracking}`)
         setChromeTrackingState(!isTracking)
         setTrackingState(!isTracking)
+    }
+
+    // Fetching the searches from API
+    function fetchSearches() {
+        const body = {
+            limit: 10,
+            projectUser: {
+                projectName: currentTrack,
+                userId: userId
+            }
+        }
+        fetch("https://codecrumbs.uc.r.appspot.com/most-recent-limited-searches", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+        .then( res => res.json())
+        .then( data => setSearches(data))
     }
 
     return (
@@ -90,12 +137,10 @@ export default function MainPage () {
             </div>
             <div>
                 <p>{divider2}</p>
-                {/* <ItemBox title="Stack Overflowwww ddsfsdfdsfsd" comment="https://stackoverflow.com.questions..." onButton1Press={alert} onButton2Press={alert}/>
-                <ItemBox title="Stack Overflowwww" /> */}
                 {bottomContent}
             </div>
             <button onClick={() => trackingButtonClicked()}>{isTracking ? "STOP TRACKING" : "START TRACKING"}</button>
-            <button onClick={() => changeProjectClicked()}>click here</button>
+            <button onClick={() => changeProjectClicked()}>{currentTrack ? "Switch Project" : "Select Project"}</button>
         </div>
     )
 }
@@ -107,12 +152,10 @@ function handleChange(text) {
 
 function setChromeTrackingState(trackingState) {
     chrome.storage.local.set({'isTracking': trackingState}, function() {
-        // console.log('Tracking State is set to ' + trackingState);
     });
 }
 
 function setChromeCurrentTrack(track) {
     chrome.storage.local.set({'currentTrack': track}, function() {
-        // console.log('Current track set to: ' + track);
     });
 }
