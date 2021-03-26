@@ -1,5 +1,5 @@
 /*global chrome*/
-import React from "react";
+import React, { useState } from "react";
 import { Router, Link } from "@reach/router";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
