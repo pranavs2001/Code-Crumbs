@@ -11,9 +11,6 @@
       "default_popup": "popup.html"
   },
   "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
-<<<<<<< HEAD
-  "permissions": [ "storage" ]
-=======
   "permissions": [
     "tabs",
     "storage",
@@ -23,5 +20,4 @@
     "scripts": ["background.js"],
     "persistent": false
   }
->>>>>>> 8d216efa0580dfa5530e40171dae50011af92031
 }
