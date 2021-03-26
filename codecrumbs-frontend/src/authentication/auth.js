@@ -1,31 +1,10 @@
-<<<<<<< HEAD
 /*global chrome*/
 import React from "react";
-=======
-    /*global chrome*/
-import React, { useState } from "react";
->>>>>>> 8d216efa0580dfa5530e40171dae50011af92031
 import { Router, Link } from "@reach/router";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import ProfilePage from "./ProfilePage";
 import PasswordReset from "./PasswordReset";
-<<<<<<< HEAD
-import { UserContext, UserProvider } from './providers/UserProvider';
-
-function Authentication() {
-    var user = null;
-
-    chrome.storage.local.get(['userId'], function (result) {
-        console.log('Value currently is ' + result.key);
-
-        userId = result.key.uid;
-    });
-
-    return (
-        userId ?
-            <ProfilePage />
-=======
 import MainPage from "../MainPage";
 
 function Authentication() {
@@ -38,7 +17,6 @@ function Authentication() {
     return (
         userId ?
             <MainPage/>
->>>>>>> 8d216efa0580dfa5530e40171dae50011af92031
             :
             <div>
                 <nav>

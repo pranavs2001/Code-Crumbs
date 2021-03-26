@@ -14,18 +14,11 @@ const SignIn = () => {
         auth.signInWithEmailAndPassword(email, password).then((userCredential) => {
             var userId = userCredential.user.uid
             // SUCESSFUL LOGIN
-<<<<<<< HEAD
 
             chrome.storage.local.set({ 'userId': userId }, function () {
                 console.log('Value is set to ' + userId);
             });
 
-=======
-            
-            chrome.storage.local.set({'userId': userId}, function() {
-                console.log('Value is set to ' + userId);
-              });
->>>>>>> 8d216efa0580dfa5530e40171dae50011af92031
 
         }).catch(error => {
             setError("Error signing in with password and email!");
