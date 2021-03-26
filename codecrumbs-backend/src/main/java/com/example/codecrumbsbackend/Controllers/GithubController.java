@@ -246,7 +246,7 @@ public class GithubController implements ErrorController {
         ObjectNode objNode = mapper.createObjectNode();
 
         try {
-            String accessToken = "0fa671f4c0033ee7cde1527d502e92cbce13ddcd"; //userRepository.getUserInfo(commit.getUserId()).getGithubAccessToken();
+            String accessToken = userRepository.getUserInfo(commit.getUserId()).getGithubAccessToken();
             String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[0] + "/", commit.getOwner() + "/", commit.getRepo() + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[1]};
             String urlResource = urlFormatter(urlElems);
 
