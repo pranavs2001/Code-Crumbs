@@ -3,7 +3,7 @@ import ItemBox from './Components/ItemBox'
 import TrackerButton from './Components/TrackerButton'
 import React, { useState } from 'react'
 
-export default function MainPage () {
+export default function MainPage() {
     const [currentURL, setCurrentURL] = useState('')
     const [isChangingProject, setIsChangingProject] = useState(false)
     const [currentTrack, setCurrentTrack] = useState(undefined)
@@ -13,21 +13,21 @@ export default function MainPage () {
     var userId
 
     // Getting information stored locally in chrome
-    chrome.storage.local.get(['isTracking'], function(result) {
-        if(isTracking === undefined && result && result.isTracking !== undefined) {
+    chrome.storage.local.get(['isTracking'], function (result) {
+        if (isTracking === undefined && result && result.isTracking !== undefined) {
             setTrackingState(result.isTracking)
         }
     })
 
-    chrome.storage.local.get(['currentTrack'], function(result) {
-        if(currentTrack === undefined && result && result.currentTrack) {
+    chrome.storage.local.get(['currentTrack'], function (result) {
+        if (currentTrack === undefined && result && result.currentTrack) {
             setCurrentTrack(result.currentTrack)
         }
     })
 
-    chrome.storage.local.get(['userId'], function(result) {
+    chrome.storage.local.get(['userId'], function (result) {
         console.log(`UserID: ${result.userId}`)
-        if(result && result.userId) {
+        if (result && result.userId) {
             userId = result.userId
         }
     })
@@ -36,7 +36,7 @@ export default function MainPage () {
     if (!searches) {
         setTimeout(fetchSearches, 500)
     }
-    
+
     // POPULATING THE ELEMENTS
     var title
     var divider1
@@ -44,22 +44,22 @@ export default function MainPage () {
     var currentElement
     var bottomContent
 
-    if(isChangingProject) {
+    if (isChangingProject) {
         title = "Projects"
         divider1 = "Current Project"
         divider2 = "Other Projects"
 
-        if(currentTrack) {
-            currentElement = <ItemBox title={currentTrack} isCurrent/>
+        if (currentTrack) {
+            currentElement = <ItemBox title={currentTrack} isCurrent />
         } else {
-            currentElement = <div style={{width: '352px'}}>Select a current project</div>
+            currentElement = <div style={{ width: '352px' }}>Select a current project</div>
         }
 
-        if(projects) {
+        if (projects) {
             console.log(projects)
-            bottomContent = projects.map(project => <div id={project.name} onClick={() => projectClicked(project.name)}><ItemBox title={project.name}/></div>)
+            bottomContent = projects.map(project => <div id={project.name} onClick={() => projectClicked(project.name)}><ItemBox title={project.name} /></div>)
         } else {
-            bottomContent = <div style={{width: '352px'}} >No projects yet...</div>
+            bottomContent = <div style={{ width: '352px' }} >No projects yet...</div>
         }
 
     } else {
@@ -67,18 +67,18 @@ export default function MainPage () {
         divider1 = "Current Search"
         divider2 = "Latest Searches"
 
-        if(isTracking) {
-            currentElement = <ItemBox title={currentURL} onCommentSubmit={isChangingProject ? undefined : handleChange} isCurrent/>
+        if (isTracking) {
+            currentElement = <ItemBox title={currentURL} onCommentSubmit={isChangingProject ? undefined : handleChange} isCurrent />
         } else {
-            currentElement = <div style={{width: '352px'}}>Not tracking current site</div>
+            currentElement = <div style={{ width: '352px' }}>Not tracking current site</div>
         }
 
         console.log(searches)
-        if(searches) {
-            bottomContent = searches.map(search => <div id={search.websiteUrl}><ItemBox title={search.websiteUrl}/></div>)
+        if (searches) {
+            bottomContent = searches.map(search => <div id={search.websiteUrl}><ItemBox title={search.websiteUrl} /></div>)
         } else {
-            bottomContent = <div style={{width: '352px'}}>No content yet...</div>
-            bottomContent = <div style={{width: '352px'}}>{currentTrack ? "Fetching recent tracks" : "Select project to see tracking history"}</div>
+            bottomContent = <div style={{ width: '352px' }}>No content yet...</div>
+            bottomContent = <div style={{ width: '352px' }}>{currentTrack ? "Fetching recent tracks" : "Select project to see tracking history"}</div>
         }
     }
 
@@ -89,14 +89,14 @@ export default function MainPage () {
 
     // Clicked Functions
     function changeProjectClicked() {
-        fetch("https://codecrumbs.uc.r.appspot.com/all-projects/"+userId)
-        .then( res => res.json())
-        .then( data => {
-            setProjects(data) 
-        })
-        .catch(error => {
-            console.error('There has been a problem with your fetch operation...', error)
-        })
+        fetch("https://codecrumbs.uc.r.appspot.com/all-projects/" + userId)
+            .then(res => res.json())
+            .then(data => {
+                setProjects(data)
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation...', error)
+            })
         setIsChangingProject(isChangingProject ? false : true)
     }
 
@@ -129,11 +129,34 @@ export default function MainPage () {
             },
             body: JSON.stringify(body)
         })
-        .then( res => res.json())
-        .then( data => setSearches(data))
-        .catch(error => {
-            console.error('There has been a problem with your fetch operation...', error)
+            .then(res => res.json())
+            .then(data => setSearches(data))
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation...', error)
+            })
+    }
+
+    function addProject(userId, name) {
+        let body = {
+            associatedUserId: userId,
+            name: name,
+            numberOfSearches: 0
+        }
+        updatedProjects = projects;
+
+        fetch(`${baseURL}/new-project`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body)
         })
+            .then(respose => response.json)
+            .then(data =>
+                setProjects(projects.append(data.name))
+            )
+            .catch("Error with creating new project")
+
     }
 
     return (
@@ -147,22 +170,22 @@ export default function MainPage () {
                 <p className="overline">{divider2}</p>
                 {bottomContent}
             </div>
-            <TrackerButton isTracking={true} text={isTracking ? "STOP TRACKING" : "START TRACKING"} isUp={isChangingProject} leftClicked={() => trackingButtonClicked()} rightClicked={() => changeProjectClicked()}/>
+            <TrackerButton isTracking={true} text={isTracking ? "STOP TRACKING" : "START TRACKING"} isUp={isChangingProject} leftClicked={() => trackingButtonClicked()} rightClicked={() => changeProjectClicked()} />
         </div>
     )
 }
 
 function handleChange(text) {
-    chrome.runtime.sendMessage({name: "commentRecorded", comment: text}, (response) => {
+    chrome.runtime.sendMessage({ name: "commentRecorded", comment: text }, (response) => {
     })
 }
 
 function setChromeTrackingState(trackingState) {
-    chrome.storage.local.set({'isTracking': trackingState}, function() {
+    chrome.storage.local.set({ 'isTracking': trackingState }, function () {
     });
 }
 
 function setChromeCurrentTrack(track) {
-    chrome.storage.local.set({'currentTrack': track}, function() {
+    chrome.storage.local.set({ 'currentTrack': track }, function () {
     });
 }
