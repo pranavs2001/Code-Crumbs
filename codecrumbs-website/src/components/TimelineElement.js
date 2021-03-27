@@ -2,6 +2,7 @@ import {useState} from "react";
 
 function TimelineElement(props) {
     const [activeVal, setActiveVal] = useState(false);
+    const [commentsOpened, setCommentsOpened] = useState(false);
     const mouseEnter = () => {
         setActiveVal(true);
     }
@@ -15,12 +16,20 @@ function TimelineElement(props) {
         if(commentText.trim() != "") {
             console.log("Hello");
         } else {
-            
+            if(commentsOpened) {
+                document.getElementById("commentIcon" + String(props.uuid)).innerHTML = "&#8853;";
+                props.handleCloseComments(document.getElementById("timelineContainer" + String(props.uuid)));
+                setCommentsOpened(false);
+            } else {
+                document.getElementById("commentIcon" + String(props.uuid)).innerHTML = "&#9447;";
+                props.handleOpenComments(document.getElementById("timelineContainer" + String(props.uuid)));
+                setCommentsOpened(true);
+            }
         }
     }
 
     return (
-        <div className="AbsPos TimelineElement" style={props.style} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
+        <div id={"timelineContainer" + String(props.uuid)} className="AbsPos TimelineElement" style={props.style} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
             <div className="TopLeft ImageContainer">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Mitch_McConnell_2016_official_photo_%28cropped%29.jpg/1200px-Mitch_McConnell_2016_official_photo_%28cropped%29.jpg" className="AbsPos Image"/>
             </div>
@@ -42,7 +51,7 @@ function TimelineElement(props) {
                 </div>
             </div>
             <div id={"commentContainer" + String(props.uuid)} className="AbsPos CommentContainer">
-                <div className={"AbsPos IconsGeneral Hidden" + ((activeVal) ? " Visible" : " Hidden")} 
+                <div id={"commentIcon" + String(props.uuid)} className={"AbsPos IconsGeneral Hidden" + ((activeVal) ? " Visible" : " Hidden")} 
                     style={{left: "94%", top: "0vh", height: "4vh"}}
                     onClick={commentClicked}>
                     &#8853;
