@@ -1,6 +1,7 @@
     /*global chrome*/
 import React, { useState } from "react";
-import { Link } from "@reach/router";
+
+import { Link, navigate } from "@reach/router";
 import { UserContext } from "./providers/UserProvider";
 import { auth, signInWithGoogle, generateUserDocument } from "./firebase/firebase";
 
@@ -12,11 +13,14 @@ const SignIn = () => {
     const signInWithEmailAndPasswordHandler = (event, email, password) => {
         event.preventDefault();
         auth.signInWithEmailAndPassword(email, password).then((userCredential) => {
-            var userId = userCredential.user.uid
+
             // SUCESSFUL LOGIN
+            setError(null)
+            var userId = userCredential.user.uid
 
             chrome.storage.local.set({ 'userId': userId }, function () {
                 console.log('Value is set to ' + userId);
+                navigate('mainPage')
             });
 
 

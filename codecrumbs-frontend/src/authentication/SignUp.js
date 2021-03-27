@@ -1,6 +1,6 @@
 /*global chrome*/
 import React, { useState } from "react";
-import { Link } from "@reach/router";
+import { Link, navigate } from "@reach/router";
 import { UserContext } from "./providers/UserProvider";
 import { auth, signInWithGoogle, generateUserDocument } from "./firebase/firebase";
 
@@ -18,6 +18,7 @@ const SignUp = () => {
 
             chrome.storage.local.set({'userId': user.uid}, function() {
                 console.log('Value is set to ' + user.uid);
+                navigate('mainPage')
               });
         }
         catch (error) {

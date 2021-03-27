@@ -1,3 +1,4 @@
+
 .App {
   text-align: center;
   padding: 24px
@@ -81,6 +82,29 @@
   height: 20px;
   width: 20px;
   background-color: #61dafb;
+  border-radius: 6px;
+}
+
+.trackerButton {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.trackerButton > .trackerButtonLeft {
+  background-color: #FF5C5C;
+  margin-right: 4px;
+  color: white;
+  padding: 8px;
+}
+
+.trackerButton > .trackerButtonRight {
+  background-color: #FF5C5C;
+  margin-left: 4px;
+  color: white;
+}
+
+button {
+  border: none;
   border-radius: 6px;
 }
 

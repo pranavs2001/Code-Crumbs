@@ -1,5 +1,6 @@
 /*global chrome*/
 import ItemBox from './Components/ItemBox'
+import TrackerButton from './Components/TrackerButton'
 import React, { useState } from 'react'
 
 export default function MainPage () {
@@ -51,13 +52,13 @@ export default function MainPage () {
         if(currentTrack) {
             currentElement = <ItemBox title={currentTrack} isCurrent/>
         } else {
-            currentElement = <div>Select a current project</div>
+            currentElement = <div style={{width: '352px'}}>Select a current project</div>
         }
 
         if(projects) {
             bottomContent = projects.map(project => <div id={project.name} onClick={() => projectClicked(project.name)}><ItemBox title={project.name}/></div>)
         } else {
-            bottomContent = <div>No projects yet...</div>
+            bottomContent = <div style={{width: '352px'}} >No projects yet...</div>
         }
 
     } else {
@@ -91,6 +92,9 @@ export default function MainPage () {
         .then( res => res.json())
         .then( data => {
             setProjects(data) 
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation...', error)
         })
         setIsChangingProject(isChangingProject ? false : true)
     }
@@ -126,6 +130,9 @@ export default function MainPage () {
         })
         .then( res => res.json())
         .then( data => setSearches(data))
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation...', error)
+        })
     }
 
     return (
@@ -139,8 +146,9 @@ export default function MainPage () {
                 <p>{divider2}</p>
                 {bottomContent}
             </div>
-            <button onClick={() => trackingButtonClicked()}>{isTracking ? "STOP TRACKING" : "START TRACKING"}</button>
-            <button onClick={() => changeProjectClicked()}>{currentTrack ? "Switch Project" : "Select Project"}</button>
+            <TrackerButton isTracking={true} text={isTracking ? "STOP TRACKING" : "START TRACKING"} isUp={isChangingProject} leftClicked={() => trackingButtonClicked()} rightClicked={() => changeProjectClicked()}/>
+            {/* <button onClick={() => trackingButtonClicked()}>{isTracking ? "STOP TRACKING" : "START TRACKING"}</button>
+            <button onClick={() => changeProjectClicked()}>{currentTrack ? "Switch Project" : "Select Project"}</button> */}
         </div>
     )
 }
