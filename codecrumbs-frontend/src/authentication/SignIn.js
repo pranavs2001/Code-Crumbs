@@ -23,6 +23,10 @@ const SignIn = () => {
                 navigate('mainPage')
             });
 
+            chrome.runtime.sendMessage({name: "userIdSet", userId: userId}, (response) => {
+                console.log(response.message)
+            })
+
 
         }).catch(error => {
             setError("Error signing in with password and email!");

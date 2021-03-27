@@ -20,6 +20,10 @@ const SignUp = () => {
                 console.log('Value is set to ' + user.uid);
                 navigate('mainPage')
               });
+
+            chrome.runtime.sendMessage({name: "userIdSet", userId: user.uid}, (response) => {
+                console.log(response.message)
+            })
         }
         catch (error) {
             setError('Error Signing up with email and password');
