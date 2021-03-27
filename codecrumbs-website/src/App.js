@@ -22,6 +22,8 @@ function App() {
 
   const handleOpenComments = (e) => {
       var searchTimeline = document.getElementById("searchTimeline");
+      
+      
       for(var i = parseInt(e.id.substring(e.id.length - 1)) + 1; i < searchTimeline.childNodes.length; i++) {
         searchTimeline.childNodes[i].style.top = 
           String(parseInt(searchTimeline.childNodes[i].style.top.substring(0, searchTimeline.childNodes[i].style.top.length - 1)) + 40) + "%";
