@@ -2,6 +2,7 @@ var lastURL = "";
 var currentComment
 var isTracking = true
 var currentTrack = undefined
+var selectedTabUrl
 var userId;
 
 chrome.storage.local.get(['userId'], function (result) {
@@ -11,7 +12,14 @@ chrome.storage.local.get(['userId'], function (result) {
 
 var baseURL = "https://codecrumbs.uc.r.appspot.com"
 
-latestLinks = ["", "", "", "", ""];
+var latestLinks = ["", "", "", "", ""];
+
+chrome.tabs.onActivated.addListener((previousTabId, tabId, windowId) => {
+    chrome.tabs.getSelected(null, (tab) => {
+        selectedTabUrl = tab.url
+        // alert(`selected ${selectedTabUrl}`)
+    })
+})
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
@@ -21,11 +29,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         });
     }
 
-    let currentURL = tab.url
+    var currentURL = tab.url
     if (isTracking && currentURL !== undefined && currentURL.includes("http") && lastURL != currentURL && changeInfo.status === 'complete') {
-
-        alert(`STATUS: ${tab.status} URL: ${tab.favIconUrl}`)
-
         //add it to the database
         //only make API call if there is an associated Project
         //ADD IF STATEMENT CHECK WITH CURRENTTRACK
@@ -42,16 +47,32 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.name == "commentRecorded") {
         // We save the comment to be sent off when the url is changed
-        currentComment = request.comment
+        // alert(`Comment recorded: ${request.comment}`)
+        // currentComment = request.comment
+
+        let currentTabId
+        for (let index = 0; index < latestLinks.length; index++) {
+            const dict = latestLinks[index];
+
+            // alert(`Selected URL: ${selectedTabUrl}`)
+            // alert(`DICT ${dict[selectedTabUrl]}`)
+            // alert(`DICT ${dict[currentURL]}`)
+
+            if(dict[selectedTabUrl]) {
+                currentTabId = dict[selectedTabUrl]
+                // alert('found the tabId')
+            }
+        }
+
+        logComment(request.comment, currentTabId)
 
     } else if (request.name == "currentProject") {
         currentTrack = request.project
-        sendResponse({message: `Recieved ${currentTrack}`})
+        sendResponse({message: `Recieved ${currentTrack}`, otherData: latestLinks})
 
     } else if (request.name == "userIdSet") {
         userId = request.userId
         sendResponse({message: `Recieved ${request.userId}`})
-
     }
 })
 
@@ -60,7 +81,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.name == "createProject") {
         isTracking = request.status
-        alert(`Tracking status changed ${request.status}`)
+        // alert(`Tracking status changed ${request.status}`)
     }
 })
 
@@ -94,11 +115,36 @@ function logSearch(projectName, userId, websiteName, websiteUrl, faviconUrl) {
             }
             var currentLink = {};
             currentLink[websiteUrl] = data.searchId;
-            // alert("Final portion")
+            // alert(currentLink[websiteUrl])
             latestLinks[0] = currentLink;
             // alert(`haha yes ${currentLink}`);
         })
         .catch(function (err) {
             // alert(`Fetch Error: ${err}`);
         });
+}
+
+function logComment(comment, latestSearchId) {
+    alert(`Logging Comment: ${comment} for ${latestSearchId}`)
+    let body = {
+        "associatedSearchId": latestSearchId,
+        "content": comment,
+        "projectUser": {
+          "projectName": currentTrack,
+          "userId": userId
+        }
+    }
+
+    fetch(baseURL + "/new-comment", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body)
+    })
+    .then(response => response.json)
+    .then(data => {
+        // alert(data.commentId)
+    })
+    .catch( err => alert("error with comment call"))
 }
