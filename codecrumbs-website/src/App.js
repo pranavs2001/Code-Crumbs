@@ -44,20 +44,24 @@ function App() {
   const renderElements1 = [];
   const renderElements2 = [];
 
-  // fetch("http://codecrumbs.uc.r.appspot.com/most-recent-limited-searches", {
-  //   method: 'POST',
-  //   body: JSON.stringify(data),
-  // })
-  // .then(response => response.json())
-  // .then(dataVal => {
-
-  // });
-
-  // fetch()
-  // .then(response => response.json())
-  // .then(data => {
+  const data = {
     
-  // });
+  };
+  
+  fetch("http://codecrumbs.uc.r.appspot.com/most-recent-limited-searches", {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+  .then(response => response.json())
+  .then(dataVal => {
+
+  });
+
+  fetch()
+  .then(response => response.json())
+  .then(data => {
+    
+  });
 
 
   //temp for generating random names
