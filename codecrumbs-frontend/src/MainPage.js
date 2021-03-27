@@ -56,6 +56,7 @@ export default function MainPage () {
         }
 
         if(projects) {
+            console.log(projects)
             bottomContent = projects.map(project => <div id={project.name} onClick={() => projectClicked(project.name)}><ItemBox title={project.name}/></div>)
         } else {
             bottomContent = <div style={{width: '352px'}} >No projects yet...</div>
@@ -139,16 +140,14 @@ export default function MainPage () {
         <div>
             <h1>{title}</h1>
             <div>
-                <p>{divider1}</p>
+                <p className="overline">{divider1}</p>
                 {currentElement}
             </div>
             <div>
-                <p>{divider2}</p>
+                <p className="overline">{divider2}</p>
                 {bottomContent}
             </div>
             <TrackerButton isTracking={true} text={isTracking ? "STOP TRACKING" : "START TRACKING"} isUp={isChangingProject} leftClicked={() => trackingButtonClicked()} rightClicked={() => changeProjectClicked()}/>
-            {/* <button onClick={() => trackingButtonClicked()}>{isTracking ? "STOP TRACKING" : "START TRACKING"}</button>
-            <button onClick={() => changeProjectClicked()}>{currentTrack ? "Switch Project" : "Select Project"}</button> */}
         </div>
     )
 }

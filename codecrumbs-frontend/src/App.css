@@ -81,13 +81,16 @@
 .imagePlaceholder {
   height: 20px;
   width: 20px;
-  background-color: #61dafb;
+  background-color: rgba(0, 0, 0, 0.87);
   border-radius: 6px;
 }
 
 .trackerButton {
   margin-top: 24px;
   margin-bottom: 12px;
+  display: flex;
+  align-content: center;
+  justify-content: center;
 }
 
 .trackerButton > .trackerButtonLeft {
@@ -103,9 +106,19 @@
   color: white;
 }
 
+.overline {
+  font-family: "Roboto";
+  color: rgba(0, 0, 0, 0.60);
+  font-weight: bold;
+  font-size: 10;
+}
+
 button {
   border: none;
   border-radius: 6px;
+  font-family: "Roboto";
+  font-size: 14px;
+  font-weight: bold;
 }
 
 /* General Stylings */

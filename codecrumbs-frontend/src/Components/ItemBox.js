@@ -61,10 +61,10 @@ export default class ItemBox extends Component {
                     </div>
                     {this.state.isHovering ? <div className="iconBox" style={{display: 'flex', flexDirection: 'row'}}>
                         <button onClick={this.props.onButton1Clicked} style={{width: '20px', height: '20px', padding: '0px'}}>
-                            <img style={{width: '20px', height: '20px', padding: '0px'}} src="https://media.discordapp.net/attachments/680983182195425354/824091788389384242/ab67706c0000bebb180554d929cae4cf02eb3ec6.png"/>
+                            <span style={{width: '20px', height: '20px', padding: '0px'}} class="material-icons">delete</span>
                         </button>
                         <button onClick={this.props.onButton2Clicked} style={{width: '20px', height: '20px', padding: '0px'}}>
-                            <img style={{width: '20px', height: '20px', padding: '0px'}} src="https://media.discordapp.net/attachments/680983182195425354/824091788389384242/ab67706c0000bebb180554d929cae4cf02eb3ec6.png"/>
+                        <span style={{width: '20px', height: '20px', padding: '0px'}} class="material-icons">star</span>
                         </button>
                     </div> : ''}
                 </div>
