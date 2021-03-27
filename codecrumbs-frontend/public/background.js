@@ -6,7 +6,7 @@ var userId;
 
 chrome.storage.local.get(['userId'], function (result) {
     userId = result.userId;
-    console.log('Value currently is ' + result.userId);
+    // alert(`Background UserID set to ${userId}`)
 });
 
 var baseURL = "https://codecrumbs.uc.r.appspot.com"
@@ -43,7 +43,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         currentComment = request.comment
 
     } else if (request.name == "currentProject") {
-        currentProject = request.project
+        currentTrack = request.project
+        sendResponse({message: `Recieved ${currentTrack}`})
+
+    } else if (request.name == "userIdSet") {
+        userId = request.userId
+        sendResponse({message: `Recieved ${request.userId}`})
+
     }
 })
 
@@ -59,6 +65,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // API CALLS - going to seperate in due time
 
 function logSearch(projectName, userId, websiteName, websiteUrl) {
+    // alert(`Logging: ${projectName}, ${userId}, ${websiteName}, ${websiteUrl}`)
+
     let body = {
         associatedProjectName: projectName,
         associatedUserId: userId,
@@ -85,9 +93,9 @@ function logSearch(projectName, userId, websiteName, websiteUrl) {
             currentLink[websiteUrl] = data.searchId;
             // alert("Final portion")
             latestLinks[0] = currentLink;
-            // alert("haha yes: ", currentLink);
+            // alert(`haha yes ${currentLink}`);
         })
         .catch(function (err) {
-            // alert('Fetch Error :-S', err);
+            // alert(`Fetch Error: ${err}`);
         });
 }

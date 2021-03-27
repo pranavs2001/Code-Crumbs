@@ -75,7 +75,9 @@ export default function MainPage () {
         console.log("project clicked: " + name)
         setChromeCurrentTrack(name)
         setCurrentTrack(name)
-        chrome.runtime.sendMessage({currentProject: name}, () => {})
+        chrome.runtime.sendMessage({name: "currentProject", project: name}, (response) => {
+            console.log(response.message)
+        })
     }
 
     function trackingButtonClicked() {
