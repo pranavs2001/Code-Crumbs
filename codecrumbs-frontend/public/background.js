@@ -14,7 +14,6 @@ var baseURL = "https://codecrumbs.uc.r.appspot.com"
 latestLinks = ["", "", "", "", ""];
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    let currentURL = changeInfo.url;
 
     if (!currentTrack) {
         chrome.storage.local.get(['currentTrack'], function (result) {
@@ -22,12 +21,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         });
     }
 
-    if (isTracking && currentURL !== undefined && currentURL.includes("http") && lastURL != currentURL) {
+    let currentURL = tab.url
+    if (isTracking && currentURL !== undefined && currentURL.includes("http") && lastURL != currentURL && changeInfo.status === 'complete') {
+
+        alert(`STATUS: ${tab.status} URL: ${tab.favIconUrl}`)
 
         //add it to the database
         //only make API call if there is an associated Project
         //ADD IF STATEMENT CHECK WITH CURRENTTRACK
-        logSearch(currentTrack, userId, "Website Filler value", currentURL);
+        logSearch(currentTrack, userId, "Website Filler value", currentURL, tab.favIconUrl);
 
         //alert(newSearchReturn);
         //store it in locally for easy access and to keep track of currently opened tabs
@@ -64,14 +66,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // API CALLS - going to seperate in due time
 
-function logSearch(projectName, userId, websiteName, websiteUrl) {
+function logSearch(projectName, userId, websiteName, websiteUrl, faviconUrl) {
     // alert(`Logging: ${projectName}, ${userId}, ${websiteName}, ${websiteUrl}`)
 
     let body = {
         associatedProjectName: projectName,
         associatedUserId: userId,
         websiteName: websiteName,
-        websiteUrl: websiteUrl
+        websiteUrl: websiteUrl,
+        imageUrl: faviconUrl
     }
 
     fetch(baseURL + "/new-search", {

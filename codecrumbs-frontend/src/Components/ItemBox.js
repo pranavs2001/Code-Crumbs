@@ -9,6 +9,7 @@ export default class ItemBox extends Component {
     // title - The title of the itembox
     // onButton1Press - callback for button1 press
     // onButton2Press - callback for button2 press
+    // imageUrl - url for the icon
 
     constructor(props) {
         super(props)
@@ -55,7 +56,9 @@ export default class ItemBox extends Component {
         return(
             <div className={className} onMouseEnter={() => this.setState({isHovering: true})} onMouseLeave={() => this.setState({isHovering: false})}>
                 <div className="itemBoxContent" style={marginStyle}>
-                    <div className="imagePlaceholder"></div>
+                    <div className="imagePlaceholder">
+                        <img src={this.props.imageUrl} className="imagePlaceholder"></img>
+                    </div>
                     <div style={{display: 'flex', justifyContent: 'center', flexDirection: 'column'}}>
                         <p style={{marginLeft: '4px'}} className='extensionH2'>{this.props.title}</p>
                     </div>

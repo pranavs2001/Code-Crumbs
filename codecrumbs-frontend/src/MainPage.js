@@ -5,6 +5,7 @@ import React, { useState } from 'react'
 
 export default function MainPage () {
     const [currentURL, setCurrentURL] = useState('')
+    const [currentSRC, setCurrentSRC] = useState('')
     const [isChangingProject, setIsChangingProject] = useState(false)
     const [currentTrack, setCurrentTrack] = useState(undefined)
     const [isTracking, setTrackingState] = useState(undefined)
@@ -68,14 +69,14 @@ export default function MainPage () {
         divider2 = "Latest Searches"
 
         if(isTracking) {
-            currentElement = <ItemBox title={currentURL} onCommentSubmit={isChangingProject ? undefined : handleChange} isCurrent/>
+            currentElement = <ItemBox title={currentURL} onCommentSubmit={isChangingProject ? undefined : handleChange} imageUrl={currentSRC} isCurrent/>
         } else {
             currentElement = <div style={{width: '352px'}}>Not tracking current site</div>
         }
 
         console.log(searches)
         if(searches) {
-            bottomContent = searches.map(search => <div id={search.websiteUrl}><ItemBox title={search.websiteUrl}/></div>)
+            bottomContent = searches.map(search => <div id={search.websiteUrl}><ItemBox title={search.websiteUrl} imageUrl={search.imageUrl}/></div>)
         } else {
             bottomContent = <div style={{width: '352px'}}>No content yet...</div>
             bottomContent = <div style={{width: '352px'}}>{currentTrack ? "Fetching recent tracks" : "Select project to see tracking history"}</div>
@@ -85,6 +86,7 @@ export default function MainPage () {
     // Getting the current tab for display
     chrome.tabs.getSelected(null, (tab) => {
         setCurrentURL(tab.url)
+        setCurrentSRC(tab.favIconUrl)
     })
 
     // Clicked Functions
