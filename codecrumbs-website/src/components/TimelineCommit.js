@@ -2,15 +2,15 @@ function TimelineCommit(props) {
 
     return (
         <div>
-            <div id={"timelineCommitContainer" + String(props.uuid)} className="AbsPos TimelineElement" style={props.style}>
-                <div className="TopLeft ImageContainer">
-                    <img src="http://pngimg.com/uploads/github/github_PNG40.png" className="AbsPos Image"/>
+            <div id={"timelineCommitContainer" + String(props.uuid)} className="AbsPos1 TimelineElement1" style={props.style}>
+                <div className="TopLeft1 ImageContainer1">
+                    <img src="http://pngimg.com/uploads/github/github_PNG40.png" className="AbsPos1 Image1"/>
                 </div>
-                <div className="TopLeft ContentContainer">
-                    <div className="AbsPos ContentGeneral ContentUrl">
+                <div className="TopLeft1 ContentContainer1">
+                    <div className="AbsPos1 ContentGeneral1 ContentUrl1">
                         {props.commitName}
                     </div>
-                    <div className="AbsPos ContentGeneral ContentTime">
+                    <div className="AbsPos1 ContentGeneral1 ContentTime1">
                         {props.date}
                     </div>
                 </div>

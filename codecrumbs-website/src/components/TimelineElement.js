@@ -16,15 +16,7 @@ function TimelineElement(props) {
         if(commentText.trim() != "") {
             props.addComment(props.searchId, props.associatedProjectName, props.associatedUserId, commentText);
         } else {
-            if(commentsOpened) {
-                document.getElementById("commentIcon" + String(props.uuid)).innerHTML = "&#8853;";
-                props.handleCloseComments(document.getElementById("timelineContainer" + String(props.uuid)));
-                setCommentsOpened(false);
-            } else {
-                document.getElementById("commentIcon" + String(props.uuid)).innerHTML = "&#9447;";
-                props.handleOpenComments(document.getElementById("timelineContainer" + String(props.uuid)), props.searchId, props.associatedProjectName, props.associatedUserId);
-                setCommentsOpened(true);
-            }
+            alert("Comment is empty");
         }
     }
 
@@ -37,36 +29,36 @@ function TimelineElement(props) {
     }
 
     return (
-        <div id={"timelineContainer" + String(props.uuid)} className="AbsPos TimelineElement" style={props.style} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
-            <div className="TopLeft ImageContainer">
-                <img src={props.imageUrl} className="AbsPos Image"/>
+        <div id={"timelineContainer" + String(props.uuid)} className="AbsPos1 TimelineElement1" style={props.style} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
+            <div className="TopLeft1 ImageContainer1">
+                <img src={props.imageUrl} className="AbsPos1 Image1"/>
             </div>
-            <div className="TopLeft ContentContainer">
-                <div className="AbsPos ContentGeneral ContentName">
+            <div className="TopLeft1 ContentContainer1">
+                <div className="AbsPos1 ContentGeneral1 ContentName1">
                     {props.name}
                 </div>
-                <div className="AbsPos ContentGeneral ContentUrl">
+                <div className="AbsPos1 ContentGeneral1 ContentUrl1">
                     {props.url}
                 </div>
-                <div className="AbsPos ContentGeneral ContentTime">
+                <div className="AbsPos1 ContentGeneral1 ContentTime1">
                     {props.time}
                 </div>
-                <div className={"AbsPos IconsGeneral Hidden" + ((activeVal || props.starred) ? " Visible" : " Hidden")} style={{left: "88%"}}
+                <div className={"AbsPos1 IconsGeneral1 Hidden1" + ((activeVal || props.starred) ? " Visible1" : " Hidden1")} style={{left: "88%"}}
                     onClick={starClicked}>
                     &#9733; 
                 </div>
-                <div className={"AbsPos IconsGeneral Hidden" + ((activeVal) ? " Visible" : " Hidden")} style={{left: "94%"}}
+                <div className={"AbsPos1 IconsGeneral1 Hidden1" + ((activeVal) ? " Visible1" : " Hidden1")} style={{left: "94%"}}
                     onClick={deleteClicked}>
                     &#x1F5D1;
                 </div>
             </div>
-            <div id={"commentContainer" + String(props.uuid)} className="AbsPos CommentContainer">
-                <div id={"commentIcon" + String(props.uuid)} className={"AbsPos IconsGeneral Hidden" + ((activeVal) ? " Visible" : " Hidden")} 
+            <div id={"commentContainer" + String(props.uuid)} className="AbsPos1 CommentContainer1">
+                <div id={"commentIcon" + String(props.uuid)} className={"AbsPos1 IconsGeneral1 Hidden1" + ((activeVal) ? " Visible1" : " Hidden1")} 
                     style={{left: "94%", top: "0vh", height: "4vh"}}
                     onClick={commentClicked}>
                     &#8853;
                 </div>
-                <input id={"commentField" + String(props.uuid)} type="text" className="AbsPos CommentInput" placeholder="Add a comment" />
+                <input id={"commentField" + String(props.uuid)} type="text" className="AbsPos1 CommentInput1" placeholder="Add a comment" />
             </div>
         </div>
     );
