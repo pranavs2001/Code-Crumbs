@@ -16,95 +16,21 @@ function App() {
       setFirstActive(!firstActive);
   }
 
-  const handleScroll = (e) => {
-      const changedTimeline = e.target.id;
-      document.getElementById((changedTimeline == "searchTimeline") ? "commitTimeline" : "searchTimeline").scrollTop = 
-        document.getElementById(changedTimeline).scrollTop;
-  }
-
-  const handleOpenComments = (e) => {
-      var searchTimeline = document.getElementById("searchTimeline");
-      
-      for(var i = parseInt(e.id.substring(e.id.length - 1)) + 1; i < searchTimeline.childNodes.length; i++) {
-        searchTimeline.childNodes[i].style.top = 
-          String(parseInt(searchTimeline.childNodes[i].style.top.substring(0, searchTimeline.childNodes[i].style.top.length - 1)) + 40) + "%";
-      }
-      
-  }
-
-  const handleCloseComments = (e) => {
-    var searchTimeline = document.getElementById("searchTimeline");
-    for(var i = parseInt(e.id.substring(e.id.length - 1)) + 1; i < searchTimeline.childNodes.length; i++) {
-      searchTimeline.childNodes[i].style.top = 
-        String(parseInt(searchTimeline.childNodes[i].style.top.substring(0, searchTimeline.childNodes[i].style.top.length - 1)) - 40) + "%";
-    }
-  }
-
-  const starClicked = (searchId, associatedProjectName, associatedUserId, starred, uuid) => {
-    const dataForStar = {
-      "associatedProjectName": String(associatedProjectName),
-      "associatedUserId": String(associatedUserId),
-      "imageUrl": "",
-      "searchId": String(searchId),
-      "starred": Boolean(starred),
-      "timeAccessed": "",
-      "timeAccessedFormat": "",
-      "websiteName": "",
-      "websiteUrl": ""
-    }
-    fetch("http://codecrumbs.uc.r.appspot.com/star-search", {
-      method: 'POST',
-      body: JSON.stringify(dataForStar),
-    })
-    .then(response => response.json())
-    .then(dataVal => {
-      renderElements1 = [];
-      searchesFunc();
-      commits();
-    });
-  }
-
-  const deleteClicked = (searchId, associatedProjectName, associatedUserId) => {
-    const dataForDelete = {
-      "associatedProjectName": String(associatedProjectName),
-      "associatedUserId": String(associatedUserId),
-      "imageUrl": "",
-      "searchId": String(searchId),
-      "starred": "",
-      "timeAccessed": "",
-      "timeAccessedFormat": "",
-      "websiteName": "",
-      "websiteUrl": ""
-    }
-    fetch("http://codecrumbs.uc.r.appspot.com/delete-search", {
-      method: 'DELETE',
-      body: JSON.stringify(dataForDelete),
-    })
-    .then(response => response.json())
-    .then(dataVal => {
-      renderElements1 = [];  
-      searchesFunc();
-      commits();
-    });
-  }
-
-  const searches = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  
   var renderElements1 = [];
   var renderElements2 = [];
 
   const userIdValue = "";
-  chrome.storage.local.get(['userId'], function(result) {
-    userIdValue = result.userId;
-  });
+  // chrome.storage.local.get(['userId'], function(result) {
+  //   userIdValue = result.userId;
+  // });
   const userProjectValue = "";
-  chrome.storage.local.get(['currentTrack'], function(result) {
-    userProjectValue = result.currentTrack;
-  });
+  // chrome.storage.local.get(['currentTrack'], function(result) {
+  //   userProjectValue = result.currentTrack;
+  // });
 
   const dataForSearches = {
     "associatedSearchId":"",
-    "limit":"10",
+    "limit":String(Number.MAX_SAFE_INTEGER),
     "projectUser": {
       "projectName":String(userProjectValue),
       "userId":String(userIdValue),
@@ -144,6 +70,9 @@ function App() {
             <TimelineElement key={index} 
               uuid={String(value.searchId)}
               searchId={value.searchId}
+              associatedUserId={value.associatedUserId}
+              associatedProjectName={value.associatedProjectName}
+              addComment={addComment}
               style={{top: String(initTop) + "%", 
                       left: "5%",
                       width: "95%"}}
@@ -205,6 +134,115 @@ function App() {
             }
         }
       }
+    });
+  }
+
+  const handleScroll = (e) => {
+      const changedTimeline = e.target.id;
+      document.getElementById((changedTimeline == "searchTimeline") ? "commitTimeline" : "searchTimeline").scrollTop = 
+        document.getElementById(changedTimeline).scrollTop;
+  }
+
+  const handleOpenComments = (e, searchId, projectName, userId) => {
+      var searchTimeline = document.getElementById("searchTimeline");
+      const dataForComments = {
+        "associatedSearchId": String(searchId),
+        "limit": 3,
+        "projectUser": {
+          "projectName": String(projectName),
+          "userId": String(userId)
+        }
+      }
+
+      fetch("http://codecrumbs.uc.r.appspot.com/most-recent-limited-comments", {
+        method: 'POST',
+        body: JSON.stringify(dataForComments),
+      })
+      .then(response => response.json())
+      .then(dataVal => {
+        
+      });
+      
+      for(var i = parseInt(e.id.substring(e.id.length - 1)) + 1; i < searchTimeline.childNodes.length; i++) {
+        searchTimeline.childNodes[i].style.top = 
+          String(parseInt(searchTimeline.childNodes[i].style.top.substring(0, searchTimeline.childNodes[i].style.top.length - 1)) + 40) + "%";
+      }
+      
+  }
+
+  const handleCloseComments = (e) => {
+    searchesFunc();
+  }
+
+  const starClicked = (searchId, associatedProjectName, associatedUserId, starred) => {
+    const dataForStar = {
+      "associatedProjectName": String(associatedProjectName),
+      "associatedUserId": String(associatedUserId),
+      "imageUrl": "",
+      "searchId": String(searchId),
+      "starred": Boolean(starred),
+      "timeAccessed": "",
+      "timeAccessedFormat": "",
+      "websiteName": "",
+      "websiteUrl": ""
+    }
+    fetch("http://codecrumbs.uc.r.appspot.com/star-search", {
+      method: 'POST',
+      body: JSON.stringify(dataForStar),
+    })
+    .then(response => response.json())
+    .then(dataVal => {
+      renderElements1 = [];
+      searchesFunc();
+      commits();
+    });
+  }
+
+  const deleteClicked = (searchId, associatedProjectName, associatedUserId) => {
+    const dataForDelete = {
+      "associatedProjectName": String(associatedProjectName),
+      "associatedUserId": String(associatedUserId),
+      "imageUrl": "",
+      "searchId": String(searchId),
+      "starred": "",
+      "timeAccessed": "",
+      "timeAccessedFormat": "",
+      "websiteName": "",
+      "websiteUrl": ""
+    }
+    fetch("http://codecrumbs.uc.r.appspot.com/delete-search", {
+      method: 'DELETE',
+      body: JSON.stringify(dataForDelete),
+    })
+    .then(response => response.json())
+    .then(dataVal => {
+      renderElements1 = [];  
+      searchesFunc();
+      commits();
+    });
+  }
+
+  const addComment = (searchId, projectName, userId, commentContent) => {
+    const dataForAddComment = {
+      "associatedSearchId": String(searchId),
+      "commentId": "",
+      "content": String(commentContent),
+      "projectUser": {
+        "projectName": String(projectName),
+        "userId": String(userId)
+      },
+      "timeStamp": "",
+      "timeStampFormat": ""
+    }
+    fetch("http://codecrumbs.uc.r.appspot.com/new-comment",  {
+      method: 'POST',
+      body: JSON.stringify(dataForAddComment),
+    })
+    .then(response => response.json())
+    .then(dataVal => {
+      renderElements1 = [];  
+      searchesFunc();
+      commits();
     });
   }
 

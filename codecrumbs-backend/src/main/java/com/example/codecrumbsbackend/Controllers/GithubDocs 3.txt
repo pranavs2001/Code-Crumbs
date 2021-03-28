@@ -1,0 +1,152 @@
+Github Endpoint Documentation
+
+Formatting:
+/Endpoint(Parameters if any): [Http Request Method]
+Description of functionality of the Endpoint
+[Return format]
+
+/error(): [N/A]
+Returns a humorous error message in the form of html that is rendered when this page is reached on a browser.
+[String]
+
+/Github-auth-link(): [GET]
+Returns the Github authorization link for our Github app. The idea is to have users sign up using Firebase, and once this
+is successful, call this endpoint which provides a github authorization link. Then have the frontend redirect the user to
+the link, where the user can choose to accept or decline the scope of capability we request (ie. access to repos, commits,
+etc). This endpoint merely returns the relevant github link, but this is better than hardcoding the link into the frontend
+to keep the client id secret.
+[json 
+    {
+        "Status" : "Success",
+        "URL" : "..."
+    }
+]
+
+/Github-auth-callback(String code): [GET]
+This endpoint is the callback link for the Github app. The Github app routes the user to this link when they accept the scope
+that is requested, and adds the user's access token to the Firestore database. This is not meant to be called by the frontend
+of our extension, but it will return the accessToken which will need to temporarily be stored on the frontend as a session 
+variable.
+[json 
+    {
+        "Status" : "Success",
+        "AccessToken" : "..."
+    }
+]
+OR
+[json 
+    {
+        "Status" : "Error: ..."
+    }
+]
+
+/Github-access-token-response(AccessToken a): [POST]
+This endpoint takes an AccessToken object, which contains two parameters: String userId and String accessToken. The value of 
+the userId is stored on the frontend as a session variable when the user logs in, and the value of the accessToken is stored
+as a session variable from the returned value of the "/Github-auth-callback" endpoint. This is meant to be called after the 
+user accepts the scope of capability that the extension requests, from where Github will call the "/Github-auth-callback"
+endpoint, and return the access token to the frontend, where it would be stored. Then, the frontend would call this endpoint
+which stores the access token in the database and returns a success message if this occurs properly.
+[json 
+    {
+        "Status" : "Success"
+    }
+]
+OR
+[json 
+    {
+        "Status" : "Error: ..."
+    }
+]
+
+/Github-get-all-repos(String userId): [GET]
+This endpoint takes a userId, as stored on the frontend in the form of a session variable and returns a json representation
+of all of the repos that the user has. This is used in the case that the extension needs to display all repos and offer a 
+choice to users on which repo to track for. The return format is described below.
+[json
+    {
+        "Status" : "Error: ..."
+    }
+]
+OR
+[json
+    {
+        "Status" : "Success",
+        "NumRepos" : "...",
+        "1": {
+            "owner" : "...",
+            "name" : "...",
+            "NumCollaborators" : "...",
+            "collaborators" : [
+                "1" : {
+                    "login" : "..."
+                },
+                "2" : {
+                    "login" : "..."
+                },
+                ...
+            ]
+        }
+        "2" : {
+            ...
+        }
+        ...
+    }
+]
+
+/Github-get-repo(Repository r): [GET]
+This endpoint takes a Repository object, which contains three fields: String userId, String owner, and String repo. The userId
+is the id of the user of the extension, saved as a session variable on the frontend. The owner refers to the owner of the 
+repository whose information is being requested and the repo refers to the name of that repository. This information is
+provided to the frontend during the first call of the "/Github-get-all-repos" endpoint, and should be stored as a session
+variable. This endpoint returns a json object with information about the requested repository.
+[json
+    {
+        "Status" : "Error: ..."
+    }
+]
+OR
+[json
+    {
+        "Status" : "Success",
+        "NumCollaborators" : "...",
+        "owner" : "...",
+        "name" : "...",
+        "collaborators" : {
+            "1" : {
+                "login" : "..."
+            },
+            "2" : {
+                "login" : "..."
+            },
+            ...
+        }
+    }
+]
+
+/Github-get-commits(Commit commit): [GET]
+This endpoint takes a commit object, which contains four fields: String userId, String owner, String repo, and String since.
+The userId is that of the user, which is stored on the frontend. The owner and repo are those for the specific repository 
+for which commits are requested. The since value is the ISO-8601 formatted date, which is the point from which the function
+will return commits. The return format is discussed below.
+[json
+    {
+        "Status" : "Error: ..."
+    }
+]
+OR
+[json
+    {
+        "Status" : "Success",
+        "NumCommits" : "...",
+        "1" : {
+            "name" : "...",
+            "date" : "..."
+        },
+        "2" : {
+            "name" : "...",
+            "date" : "..."
+        },
+        ...
+    }
+]

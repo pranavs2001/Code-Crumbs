@@ -14,7 +14,7 @@ function TimelineElement(props) {
     const commentClicked = () => {
         var commentText = document.getElementById("commentField" + String(props.uuid)).value;
         if(commentText.trim() != "") {
-            console.log("Hello");
+            props.addComment(props.searchId, props.associatedProjectName, props.associatedUserId, commentText);
         } else {
             if(commentsOpened) {
                 document.getElementById("commentIcon" + String(props.uuid)).innerHTML = "&#8853;";
@@ -22,14 +22,14 @@ function TimelineElement(props) {
                 setCommentsOpened(false);
             } else {
                 document.getElementById("commentIcon" + String(props.uuid)).innerHTML = "&#9447;";
-                props.handleOpenComments(document.getElementById("timelineContainer" + String(props.uuid)));
+                props.handleOpenComments(document.getElementById("timelineContainer" + String(props.uuid)), props.searchId, props.associatedProjectName, props.associatedUserId);
                 setCommentsOpened(true);
             }
         }
     }
 
     const starClicked = () => {
-        props.starClicked(props.searchId, props.associatedProjectName, props.associatedUserId, props.starred, props.uuid);
+        props.starClicked(props.searchId, props.associatedProjectName, props.associatedUserId, props.starred);
     }
 
     const deleteClicked = () => {
