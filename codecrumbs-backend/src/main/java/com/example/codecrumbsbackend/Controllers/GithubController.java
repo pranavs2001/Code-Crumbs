@@ -201,7 +201,7 @@ public class GithubController implements ErrorController {
         return objNode;
     }
 
-    @GetMapping("/Github-get-repo")
+    @PostMapping("/Github-get-repo")
     public ObjectNode getUserRepo(@RequestBody Repository repository) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objNode = mapper.createObjectNode();
@@ -241,7 +241,7 @@ public class GithubController implements ErrorController {
         return objNode;
     }
 
-    @GetMapping("/Github-get-commits")
+    @PostMapping("/Github-get-commits")
     public ObjectNode getUserCommits(@RequestBody Commit commit) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objNode = mapper.createObjectNode();
