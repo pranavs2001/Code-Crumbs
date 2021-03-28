@@ -1,12 +1,17 @@
 var lastURL = "";
 var currentComment
-var isTracking = true
+var isTracking = false
 var currentTrack = undefined
 var selectedTabUrl
 var userId;
 
 chrome.storage.local.get(['userId'], function (result) {
     userId = result.userId;
+    // alert(`Background UserID set to ${userId}`)
+});
+
+chrome.storage.local.get(['isTracking'], function (result) {
+    isTracking = result.isTracking;
     // alert(`Background UserID set to ${userId}`)
 });
 
@@ -42,6 +47,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         lastURL = currentURL;
     }
     //alert("1) Latest links are ", latestLinks);
+})
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if(request.name == "trackChanged") {
+        isTracking = request.state;
+    }
 })
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
