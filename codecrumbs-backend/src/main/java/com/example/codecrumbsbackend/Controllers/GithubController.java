@@ -209,7 +209,7 @@ public class GithubController implements ErrorController {
             objNode.put(Utils.OWNER, repository.getOwner());
             objNode.put(Utils.REPO_NAME, repository.getRepo());
             String accessToken = userRepository.getUserInfo(repository.getUserId()).getGithubAccessToken();
-            String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[0] + "/", repository.getOwner() + "/", repository.getRepo() + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1]};
+            String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[1] + "/", repository.getOwner() + "/", repository.getRepo() + "/", Utils.GITHUB_API_COLLABORATORS_ENDPOINT.split("/")[2]};
             String urlResource = urlFormatter(urlElems);
 
             String[] keys = {Utils.ACCESS_TOKEN, Utils.PER_PAGE};
@@ -248,7 +248,7 @@ public class GithubController implements ErrorController {
 
         try {
             String accessToken = userRepository.getUserInfo(commit.getUserId()).getGithubAccessToken();
-            String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[0] + "/", commit.getOwner() + "/", commit.getRepo() + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[1]};
+            String[] urlElems = {Utils.GITHUB_API_BASE_URL + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[1] + "/", commit.getOwner() + "/", commit.getRepo() + "/", Utils.GITHUB_API_COMMIT_ENDPOINT.split("/")[2]};
             String urlResource = urlFormatter(urlElems);
 
             String[] keys = {Utils.ACCESS_TOKEN, Utils.SINCE};
