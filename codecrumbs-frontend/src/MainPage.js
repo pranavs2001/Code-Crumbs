@@ -69,7 +69,11 @@ export default function MainPage () {
         divider2 = "Latest Searches"
 
         if(isTracking) {
-            currentElement = <ItemBox title={currentURL} onCommentSubmit={isChangingProject ? undefined : handleChange} imageUrl={currentSRC} isCurrent/>
+            if (currentURL.includes("http")) {
+                currentElement = <ItemBox title={currentURL} onCommentSubmit={isChangingProject ? undefined : handleChange} imageUrl={currentSRC} isCurrent/>                
+            } else {
+                currentElement = <div style={{width: '352px'}}>Untrackable page. Visit a valid site to track!</div>
+            }
         } else {
             currentElement = <div style={{width: '352px'}}>Not tracking current site</div>
         }
@@ -121,7 +125,7 @@ export default function MainPage () {
     // Fetching the searches from API
     function fetchSearches() {
         const body = {
-            limit: 10,
+            limit: 4,
             projectUser: {
                 projectName: currentTrack,
                 userId: userId

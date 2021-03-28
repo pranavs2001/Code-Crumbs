@@ -2,3 +2,4 @@ codecrumbs-backend/src/main/resources/
 /codecrumbs-frontend/dist/popup.html
 package-lock.json
 yarn.lock
+/node_modules/.yarn-integrity

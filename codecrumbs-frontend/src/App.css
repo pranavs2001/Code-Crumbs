@@ -118,7 +118,17 @@ button {
   font-family: "Roboto";
   font-size: 14px;
   font-weight: bold;
+  background-color: transparent;
 }
+
+button:active {
+  border: solid;
+  border-color: rgba(0, 0, 0, 0.60);
+}
+
+/* button:focus {
+  outline: none;
+} */
 
 /* General Stylings */
 

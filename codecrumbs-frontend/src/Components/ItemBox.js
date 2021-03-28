@@ -56,20 +56,26 @@ export default class ItemBox extends Component {
         return(
             <div className={className} onMouseEnter={() => this.setState({isHovering: true})} onMouseLeave={() => this.setState({isHovering: false})}>
                 <div className="itemBoxContent" style={marginStyle}>
-                    <div className="imagePlaceholder">
-                        <img src={this.props.imageUrl} className="imagePlaceholder"></img>
-                    </div>
+                    {this.props.imageUrl ? 
+                        <div className="imagePlaceholder">
+                            <img src={this.props.imageUrl} className="imagePlaceholder"></img>
+                        </div>
+                        : 
+                        <div style={{height: '20px'}}></div>
+                    }
                     <div style={{display: 'flex', justifyContent: 'center', flexDirection: 'column'}}>
-                        <p style={{marginLeft: '4px'}} className='extensionH2'>{this.props.title}</p>
+                        <p style={{marginLeft: '4px'}} className='extensionH2'>{this.props.title ? this.props.title.substring(0, 45).concat('...') : ''}</p>
                     </div>
-                    {this.state.isHovering ? <div className="iconBox" style={{display: 'flex', flexDirection: 'row'}}>
-                        <button onClick={this.props.onButton1Clicked} style={{width: '20px', height: '20px', padding: '0px'}}>
-                            <span style={{width: '20px', height: '20px', padding: '0px'}} class="material-icons">delete</span>
-                        </button>
-                        <button onClick={this.props.onButton2Clicked} style={{width: '20px', height: '20px', padding: '0px'}}>
-                        <span style={{width: '20px', height: '20px', padding: '0px'}} class="material-icons">star</span>
-                        </button>
-                    </div> : ''}
+                    {this.state.isHovering ?
+                        <div className="iconBox" style={{display: 'flex', flexDirection: 'row', verticalAlign: 'center'}}>
+                            <button className="iconButton" style={{width: '20px', height: '20px', padding: '0px'}} onClick={this.props.onButton1Clicked}>
+                                <span style={{width: '20px', height: '20px', padding: '0px'}} class="material-icons md-18">delete</span>
+                            </button>
+                            <button className="iconButton" style={{width: '20px', height: '20px', padding: '0px', marginLeft: '4px'}} onClick={this.props.onButton2Clicked}>
+                                <span style={{width: '20px', height: '20px', padding: '0px'}} class="material-icons md-18">star</span>
+                            </button>
+                        </div> 
+                    : ''}
                 </div>
                 {comment}
             </div>
