@@ -31,7 +31,7 @@ function TimelineElement(props) {
     return (
         <div id={"timelineContainer" + String(props.uuid)} className="AbsPos TimelineElement" style={props.style} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
             <div className="TopLeft ImageContainer">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Mitch_McConnell_2016_official_photo_%28cropped%29.jpg/1200px-Mitch_McConnell_2016_official_photo_%28cropped%29.jpg" className="AbsPos Image"/>
+                <img src={props.imageUrl} className="AbsPos Image"/>
             </div>
             <div className="TopLeft ContentContainer">
                 <div className="AbsPos ContentGeneral ContentName">
