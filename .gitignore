@@ -1,2 +1,6 @@
 codecrumbs-backend/src/main/resources/
 codecrumbs-backend/src/main/java/com/example/codecrumbsbackend/Secrets/
+/codecrumbs-frontend/dist/popup.html
+package-lock.json
+yarn.lock
+/node_modules/.yarn-integrity

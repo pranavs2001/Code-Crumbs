@@ -1,13 +1,26 @@
 {
-  "name": "Extension Tester",
+  "name": "Code Crumbs",
   "version": "1.0.0",
   "manifest_version": 2,
-  "description": "Extension Test",
+  "description": "An extension for tracking your search history alongside your github commits",
   "icons": {
-      "512": "logo512.png"
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png",
+      "512": "icon512.png"
   },
   "browser_action": {
-      "default_icon": "logo512.png",
+      "default_icon": "icon512.png",
       "default_popup": "popup.html"
+  },
+  "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
+  "permissions": [
+    "tabs",
+    "storage",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
   }
 }
