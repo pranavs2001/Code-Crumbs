@@ -1,6 +1,7 @@
     /*global chrome*/
 import React, { useState } from "react";
-import { Link } from "@reach/router";
+
+import { Link, navigate } from "@reach/router";
 import { UserContext } from "./providers/UserProvider";
 import { auth, signInWithGoogle, generateUserDocument } from "./firebase/firebase";
 
@@ -12,12 +13,20 @@ const SignIn = () => {
     const signInWithEmailAndPasswordHandler = (event, email, password) => {
         event.preventDefault();
         auth.signInWithEmailAndPassword(email, password).then((userCredential) => {
-            var userId = userCredential.user.uid
+
             // SUCESSFUL LOGIN
-            
-            chrome.storage.local.set({'userId': userId}, function() {
+            setError(null)
+            var userId = userCredential.user.uid
+
+            chrome.storage.local.set({ 'userId': userId }, function () {
                 console.log('Value is set to ' + userId);
-              });
+                navigate('mainPage')
+            });
+
+            chrome.runtime.sendMessage({name: "userIdSet", userId: userId}, (response) => {
+                console.log(response.message)
+            })
+
 
         }).catch(error => {
             setError("Error signing in with password and email!");
@@ -42,7 +51,7 @@ const SignIn = () => {
             <div className="border border-blue-400 mx-auto w-11/12 md:w-2/4 rounded py-8 px-4 md:px-8">
                 {error !== null && <div className="py-4 bg-red-600 w-full text-white text-center mb-3">{error}</div>}
                 <form className="">
-                    <label htmlFor="userEmail" className="block">
+                    <label htmlFor="userEmail" className="block overline" style={{marginBottom: '4px', float: 'left'}}>
                         Email:
           </label>
                     <input
@@ -53,8 +62,9 @@ const SignIn = () => {
                         placeholder="E.g: joebruin1919@gmail.com"
                         id="userEmail"
                         onChange={(event) => onChangeHandler(event)}
+                        style={{width: '331px'}}
                     />
-                    <label htmlFor="userPassword" className="block">
+                    <label htmlFor="userPassword" className="block overline" style={{marginTop: '16px', marginBottom: '4px', float: 'left'}}>
                         Password:
           </label>
                     <input
@@ -65,18 +75,24 @@ const SignIn = () => {
                         placeholder="Your Password"
                         id="userPassword"
                         onChange={(event) => onChangeHandler(event)}
+                        style={{width: '331px'}}
                     />
-                    <button className="bg-green-400 hover:bg-green-500 w-full py-2 text-white" onClick={(event) => { signInWithEmailAndPasswordHandler(event, email, password) }}>
-                        Sign in
-          </button>
+                    <div className="trackerButton">
+                        <button className="bg-green-400 hover:bg-green-500 w-full py-2 text-white onboardButtonOutlined" style={{marginRight: '8px'}} onClick={() => { signInWithGoogle() }}>
+                            Sign In with Google
+                        </button>
+                        <button className="bg-green-400 hover:bg-green-500 w-full py-2 text-white onboardButton" onClick={(event) => { signInWithEmailAndPasswordHandler(event, email, password) }}>
+                            Sign in
+                        </button>
+                    </div>
                 </form>
-                <p className="text-center my-3">or</p>
-                <button
+                {/* <p className="text-center my-3">or</p> */}
+                {/* <button
                     className="bg-red-500 hover:bg-red-600 w-full py-2 text-white"
                     onClick={() => signInWithGoogle()}
                 >
                     Sign in with Google
-        </button>
+                </button> */}
                 <p className="text-center my-3">
                     Don't have an account?{" "}
                     <Link to="signUp" className="text-blue-500 hover:text-blue-600">

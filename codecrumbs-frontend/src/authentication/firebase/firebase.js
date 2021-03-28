@@ -23,9 +23,7 @@ export const firestore = firebase.firestore();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 export const signInWithGoogle = () => {
-  console.log("Hello1");
   auth.signInWithPopup(provider);
-  console.log("Hello2");
 };
 
 //For email/password Sign On

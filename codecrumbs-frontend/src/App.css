@@ -1,3 +1,4 @@
+
 .App {
   text-align: center;
   padding: 24px
@@ -80,8 +81,69 @@
 .imagePlaceholder {
   height: 20px;
   width: 20px;
-  background-color: #61dafb;
   border-radius: 6px;
+}
+
+.trackerButton {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+
+.trackerButton > .trackerButtonLeft {
+  background-color: #FF5C5C;
+  margin-right: 4px;
+  color: white;
+  padding: 8px;
+}
+
+.trackerButton > .trackerButtonRight {
+  background-color: #FF5C5C;
+  margin-left: 4px;
+  color: white;
+}
+
+.overline {
+  font-family: "Roboto";
+  color: rgba(0, 0, 0, 0.60);
+  font-weight: bold;
+  font-size: 10;
+}
+
+.onboardButton {
+  color: #FFFFFF;
+  background-color: #FF8F1C;
+  padding: 8px;
+}
+
+.onboardButtonOutlined {
+  color: #FF8F1C;
+  padding: 8px;
+  border: 2px solid #FF8F1C;
+  background-color: #FFFFFF;
+}
+
+.pill {
+  background-color: #FFFFFF;
+  padding: 4px;
+  margin-right: 8px;
+  border-radius: 6px;
+}
+
+button {
+  border: none;
+  border-radius: 6px;
+  font-family: "Roboto";
+  font-size: 14px;
+  font-weight: bold;
+  background-color: transparent;
+}
+
+button:active {
+  border: solid;
+  border-color: rgba(0, 0, 0, 0.60);
 }
 
 /* General Stylings */
@@ -118,13 +180,13 @@ h1 {
 }
 
 input {
-  width: 331px;
   height: 20px;
   border-radius: 6px;
   border-width: 0px;
   padding-left: 8px;
   font-family: "Roboto";
   font-size: 10px;
+  background-color: #E7E7E7;
 }
 
 @keyframes App-logo-spin {

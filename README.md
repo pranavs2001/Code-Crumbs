@@ -1,2 +1,2 @@
 # Code-Crumbs
-A way to track the BIG CHUNGUS development process!
+A way to track the development process!

@@ -1,14 +1,17 @@
-    /*global chrome*/
+/*global chrome*/
 import React, { useState } from "react";
-import { Router, Link } from "@reach/router";
+import { Router, Link, navigate } from "@reach/router";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import ProfilePage from "./ProfilePage";
 import PasswordReset from "./PasswordReset";
 import MainPage from "../MainPage";
 
+navigate("/")
+
 function Authentication() {
     const [userId, setUserId] = useState("")
+    const [isSigningIn, setIsSigningIn] = useState(true)
 
     chrome.storage.local.get(['userId'], function(result) {
         setUserId(result.userId)
@@ -19,11 +22,6 @@ function Authentication() {
             <MainPage/>
             :
             <div>
-                <nav>
-                    <Link to="/">Sign In</Link>
-                    <Link to="signUp">Sign Up</Link>
-                    <Link to="passwordReset">Reset Password</Link>
-                </nav>
                 <Router>
                     <SignUp path="signUp" />
                     <SignIn path="/" />
@@ -36,6 +34,19 @@ function Authentication() {
 }
 
 export default Authentication;
+
+
+/*<nav>
+                    <Link to="/">Sign In</Link>
+                    <Link to="signUp">Sign Up</Link>
+                    <Link to="passwordReset">Reset Password</Link>
+                </nav>
+                <Router>
+                    <SignUp path="signUp" />
+                    <SignIn path="/" />
+                    <PasswordReset path="passwordReset" />
+                </Router>*/
+
 
 /*import React from 'react';
 import ReactDOM from 'react-dom';
