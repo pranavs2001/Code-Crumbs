@@ -206,9 +206,15 @@ function handleChange(text) {
     })
 }
 
+function trackChange(value) {
+    chrome.runtime.sendMessage({name: "trackChanged", state: value}, (response) => {
+    })
+}
+
 function setChromeTrackingState(trackingState) {
     chrome.storage.local.set({'isTracking': trackingState}, function() {
     });
+    trackChange(trackingState);
 }
 
 function setChromeCurrentTrack(track) {
