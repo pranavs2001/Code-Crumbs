@@ -28,6 +28,14 @@ function TimelineElement(props) {
         }
     }
 
+    const starClicked = () => {
+        props.starClicked(props.searchId, props.associatedProjectName, props.associatedUserId, props.starred, props.uuid);
+    }
+
+    const deleteClicked = () => {
+        props.deleteClicked(props.searchId, props.associatedProjectName, props.associatedUserId);
+    }
+
     return (
         <div id={"timelineContainer" + String(props.uuid)} className="AbsPos TimelineElement" style={props.style} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
             <div className="TopLeft ImageContainer">
@@ -43,10 +51,12 @@ function TimelineElement(props) {
                 <div className="AbsPos ContentGeneral ContentTime">
                     {props.time}
                 </div>
-                <div className={"AbsPos IconsGeneral Hidden" + ((activeVal || props.starred) ? " Visible" : " Hidden")} style={{left: "88%"}}>
+                <div className={"AbsPos IconsGeneral Hidden" + ((activeVal || props.starred) ? " Visible" : " Hidden")} style={{left: "88%"}}
+                    onClick={starClicked}>
                     &#9733; 
                 </div>
-                <div className={"AbsPos IconsGeneral Hidden" + ((activeVal) ? " Visible" : " Hidden")} style={{left: "94%"}}>
+                <div className={"AbsPos IconsGeneral Hidden" + ((activeVal) ? " Visible" : " Hidden")} style={{left: "94%"}}
+                    onClick={deleteClicked}>
                     &#x1F5D1;
                 </div>
             </div>

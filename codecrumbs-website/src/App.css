@@ -1,6 +1,7 @@
 :root {
   --brandColor: rgb(241, 155, 72);
   --lighterGray: rgb(236, 236, 236);
+  --lightGray: rgb(220, 220, 220);
 }
 
 .AbsPos {
@@ -36,7 +37,7 @@
 
 .Header {
   height: 10%;
-  background-color: white;
+  background-color: rgb(96, 96, 96);
 }
 
 .Logo {
@@ -71,7 +72,6 @@
   width: 35%;
   top: 12%;
   height: 86%;
-  background-color: gray;
   overflow-y: scroll;
 }
 
@@ -87,7 +87,7 @@
   display: flex;
   flex-direction: column;
   height: 17%;
-  background-color: var(--lighterGray);
+  background-color: var(--lightGray);
 }
 
 .ImageContainer {
@@ -99,7 +99,7 @@
 .Image {
   display: block;
   left: 5%;
-  width: 90%;
+  width: auto;
   top: 20%;
   height: 60%;
 }
