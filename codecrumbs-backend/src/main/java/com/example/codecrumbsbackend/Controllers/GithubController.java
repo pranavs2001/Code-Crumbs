@@ -71,10 +71,6 @@ public class GithubController implements ErrorController {
 
     private static final String PATH = "/error";
 
-    @RequestMapping(value = PATH)
-    public String errorMessage() {
-        return "<p><span style=\"background-color: #ff0000;\">You Absolute Monkey Man</span></p><p><span style=\"background-color: #ff0000;\">What the AIDS are you doing?</span></p><p>&nbsp;</p><p><img src=\"https://i.redd.it/sfnfaudnmqo41.jpg\" alt=\"\" width=\"243\" height=\"276\" /></p>";
-    }
 
     @Override
     public String getErrorPath() {
