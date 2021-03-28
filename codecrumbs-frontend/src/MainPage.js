@@ -11,6 +11,7 @@ export default function MainPage () {
     const [isTracking, setTrackingState] = useState(undefined)
     const [projects, setProjects] = useState(undefined)
     const [searches, setSearches] = useState(undefined)
+    const [newProjectName, setNewProjectName] = useState('')
     var userId
 
     // Getting information stored locally in chrome
@@ -44,6 +45,7 @@ export default function MainPage () {
     var divider2
     var currentElement
     var bottomContent
+    var bottomBottomContent
 
     if(isChangingProject) {
         title = "Projects"
@@ -63,6 +65,19 @@ export default function MainPage () {
             bottomContent = <div style={{width: '352px'}} >No projects yet...</div>
         }
 
+        bottomBottomContent = 
+        <div>
+            <p className="overline">Create New Project</p>
+            <div style={{display: 'flex', flexDirection: 'row', width: '352px', alignItems: 'center', justifyContent: 'center'}}>
+                <form>
+                    <label>
+                        <input type='text' value={newProjectName} onChange={ (e) => setNewProjectName(e.target.value)} placeholder="placeholder"/>
+                    </label>
+                </form>
+                <button onClick={() => createProject() }>Create Project</button>
+            </div>
+        </div>
+
     } else {
         title = "Code Crumbs"
         divider1 = "Current Search"
@@ -80,7 +95,7 @@ export default function MainPage () {
 
         console.log(searches)
         if(searches) {
-            bottomContent = searches.map(search => <div id={search.websiteUrl}><ItemBox title={search.websiteUrl} imageUrl={search.imageUrl}/></div>)
+            bottomContent = searches.map(search => <div id={search.websiteUrl}><ItemBox title={search.websiteUrl ? search.websiteUrl.substring(0, 45).concat('...') : ''} imageUrl={search.imageUrl}/></div>)
         } else {
             bottomContent = <div style={{width: '352px'}}>No content yet...</div>
             bottomContent = <div style={{width: '352px'}}>{currentTrack ? "Fetching recent tracks" : "Select project to see tracking history"}</div>
@@ -95,6 +110,11 @@ export default function MainPage () {
 
     // Clicked Functions
     function changeProjectClicked() {
+        fetchProjects()
+        setIsChangingProject(isChangingProject ? false : true)
+    }
+
+    function fetchProjects() {
         fetch("https://codecrumbs.uc.r.appspot.com/all-projects/"+userId)
         .then( res => res.json())
         .then( data => {
@@ -103,7 +123,6 @@ export default function MainPage () {
         .catch(error => {
             console.error('There has been a problem with your fetch operation...', error)
         })
-        setIsChangingProject(isChangingProject ? false : true)
     }
 
     function projectClicked(name) {
@@ -145,6 +164,26 @@ export default function MainPage () {
         })
     }
 
+    function createProject() {
+        const body = {
+            associatedUserId: userId,
+            name: newProjectName
+          }
+          
+        fetch("https://codecrumbs.uc.r.appspot.com/new-project", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+        .then( res => res.json())
+        .then( data => fetchProjects())
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation...', error)
+        })
+    }
+
     return (
         <div>
             <h1>{title}</h1>
@@ -156,6 +195,7 @@ export default function MainPage () {
                 <p className="overline">{divider2}</p>
                 {bottomContent}
             </div>
+            {bottomBottomContent}
             <TrackerButton isTracking={true} text={isTracking ? "STOP TRACKING" : "START TRACKING"} isUp={isChangingProject} leftClicked={() => trackingButtonClicked()} rightClicked={() => changeProjectClicked()}/>
         </div>
     )

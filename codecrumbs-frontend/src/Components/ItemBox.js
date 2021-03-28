@@ -45,7 +45,7 @@ export default class ItemBox extends Component {
             comment = 
             <form onSubmit={this.handleSubmit} style={{display: 'flex', flexDirection: 'row'}}>
                 <label style={{width: '100%'}}>
-                    <input type='text' value={this.state.newCommentValue} onChange={this.handleChange} placeholder={this.props.comment}/>
+                    <input style={{width: '331px'}} type='text' value={this.state.newCommentValue} onChange={this.handleChange} placeholder={this.props.comment}/>
                 </label>
             </form>
 
@@ -64,7 +64,7 @@ export default class ItemBox extends Component {
                         <div style={{height: '20px'}}></div>
                     }
                     <div style={{display: 'flex', justifyContent: 'center', flexDirection: 'column'}}>
-                        <p style={{marginLeft: '4px'}} className='extensionH2'>{this.props.title ? this.props.title.substring(0, 45).concat('...') : ''}</p>
+                        <p style={{marginLeft: '4px'}} className='extensionH2'>{this.props.title}</p>
                     </div>
                     {this.state.isHovering ?
                         <div className="iconBox" style={{display: 'flex', flexDirection: 'row', verticalAlign: 'center'}}>
