@@ -25,7 +25,7 @@ public class CommentController {
     }
 
     @ApiOperation(value = "Returns specified number of most recent comments -- REQUIRED: associatedSearchId, limit, projectUser")
-    @GetMapping("/most-recent-limited-comments")
+    @PostMapping("/most-recent-limited-comments")
     public List<Comment> getMostRecentCommentsLimited(@RequestBody Limit limit) {
         return commentRepository.getMostRecentCommentsLimited(limit.getLimit(), limit.getProjectUser(), limit.getAssociatedSearchId());
     }

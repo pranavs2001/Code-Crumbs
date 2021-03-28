@@ -13,10 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Slf4j
@@ -60,6 +57,7 @@ public class CommentRepository {
 
     public List<Comment> getMostRecentCommentsLimited(int limit, ProjectUser projectUser, String associatedSearchId) {
         List<Comment> toReturn = new ArrayList<>();
+        List<Comment> done = new ArrayList<>();
         try {
             Query collectionReference = firebaseService.getDb()
                     .collection(Utils.USERS)
@@ -68,8 +66,8 @@ public class CommentRepository {
                     .document(projectUser.getProjectName())
                     .collection(Utils.SEARCHES)
                     .document(associatedSearchId)
-                    .collection(Utils.COMMENTS)
-                    .orderBy(Utils.TIME_ACCESSED, Query.Direction.DESCENDING).limit(limit);
+                    .collection(Utils.COMMENTS);
+                    //.orderBy(Utils.TIME_ACCESSED, Query.Direction.DESCENDING).limit(limit);
 
             ApiFuture<QuerySnapshot> collectionFuture = collectionReference.get();
             List<QueryDocumentSnapshot> docs = collectionFuture.get().getDocuments();
@@ -78,11 +76,15 @@ public class CommentRepository {
                 toReturn.add(snap.toObject(Comment.class));
             }
 
+            toReturn.sort(Comparator.comparing(Comment::getTimeStamp).reversed());
+
+            for (int i = 0; i < limit && i < toReturn.size(); i++)
+                done.add(toReturn.get(i));
 
         } catch (InterruptedException | ExecutionException | NullPointerException e) {
             return new ArrayList<>();
         }
-        return toReturn;
+        return done;
     }
 
     public Comment deleteComment(Comment comment) {

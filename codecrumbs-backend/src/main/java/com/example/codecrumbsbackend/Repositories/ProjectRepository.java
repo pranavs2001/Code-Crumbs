@@ -1,7 +1,7 @@
 package com.example.codecrumbsbackend.Repositories;
 
 import com.example.codecrumbsbackend.Models.*;
-import com.example.codecrumbsbackend.Secrets;
+import com.example.codecrumbsbackend.Secrets.Secrets;
 import com.example.codecrumbsbackend.Utils.Utils;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
