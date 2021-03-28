@@ -1,2 +1,3 @@
 codecrumbs-backend/src/main/resources/
+/codecrumbs-frontend/dist/popup.html
 codecrumbs-backend/src/main/java/com/example/codecrumbsbackend/Secrets/
