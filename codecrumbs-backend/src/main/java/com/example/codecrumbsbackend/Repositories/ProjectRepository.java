@@ -1,7 +1,7 @@
 package com.example.codecrumbsbackend.Repositories;
 
 import com.example.codecrumbsbackend.Models.*;
-//import com.example.codecrumbsbackend.Secrets;
+import com.example.codecrumbsbackend.Secrets.Secrets;
 import com.example.codecrumbsbackend.Utils.Utils;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
@@ -265,7 +265,7 @@ public class ProjectRepository {
                 ContentType.APPLICATION_JSON);
 
         HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost request = new HttpPost(Utils.TEXTRACT_URL); //new HttpPost(Utils.TEXTRACT_URL + Secrets.TEXTRACT_KEY);
+        HttpPost request = new HttpPost(Utils.TEXTRACT_URL + Secrets.TEXTRACT_KEY);
         request.setEntity(entity);
 
         HttpResponse response = httpClient.execute(request);
@@ -290,7 +290,7 @@ public class ProjectRepository {
                 ContentType.APPLICATION_JSON);
 
         HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost request = new HttpPost(Utils.SALIENCY_URL); //new HttpPost(Utils.SALIENCY_URL + Secrets.TEXTRACT_KEY);
+        HttpPost request = new HttpPost(Utils.SALIENCY_URL + Secrets.TEXTRACT_KEY);
         request.setEntity(entity);
 
         HttpResponse response = httpClient.execute(request);
