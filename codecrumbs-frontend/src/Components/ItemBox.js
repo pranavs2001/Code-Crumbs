@@ -19,7 +19,9 @@ export default class ItemBox extends Component {
             nlp: undefined
         }
 
-        this.fetchnlp(props.fullUrl)
+        if (props.fullUrl) {
+            this.fetchnlp(props.fullUrl)
+        }
 
         this.handleChange = this.handleChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)

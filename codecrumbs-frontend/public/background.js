@@ -34,12 +34,18 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         });
     }
 
+    // isTracking && currentURL !== undefined && currentURL.includes("http") && lastURL != currentURL && changeInfo.status === 'complete'
+
     var currentURL = tab.url
+    // if (changeInfo.status === 'complete' && lastURL != currentURL && currentURL.includes("http") && currentURL !== undefined && isTracking) {
+    //     alert(`TRACKING: ${isTracking}, CURURL: ${currentURL}, lastURL: ${lastURL}, STATUS: ${changeInfo.status}`)
+    // }
     if (isTracking && currentURL !== undefined && currentURL.includes("http") && lastURL != currentURL && changeInfo.status === 'complete') {
         //add it to the database
         //only make API call if there is an associated Project
         //ADD IF STATEMENT CHECK WITH CURRENTTRACK
-        logSearch(currentTrack, userId, "Website Filler value", currentURL, tab.favIconUrl);
+        // alert(tab.favIconUrl)
+        setTimeout(logSearch(currentTrack, userId, "Website Filler value", currentURL, tab.favIconUrl), 100)
 
         //alert(newSearchReturn);
         //store it in locally for easy access and to keep track of currently opened tabs
@@ -99,7 +105,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // API CALLS - going to seperate in due time
 
 function logSearch(projectName, userId, websiteName, websiteUrl, faviconUrl) {
-    // alert(`Logging: ${projectName}, ${userId}, ${websiteName}, ${websiteUrl}`)
+    alert(`Logging: ${projectName}, ${userId}, ${websiteName}, ${websiteUrl}`)
 
     let body = {
         associatedProjectName: projectName,
