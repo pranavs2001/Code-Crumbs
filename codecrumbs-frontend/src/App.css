@@ -112,6 +112,19 @@
   font-size: 10;
 }
 
+.onboardButton {
+  color: #FFFFFF;
+  background-color: #FF8F1C;
+  padding: 8px;
+}
+
+.onboardButtonOutlined {
+  color: #FF8F1C;
+  padding: 8px;
+  border: 2px solid #FF8F1C;
+  background-color: #FFFFFF;
+}
+
 button {
   border: none;
   border-radius: 6px;
@@ -125,10 +138,6 @@ button:active {
   border: solid;
   border-color: rgba(0, 0, 0, 0.60);
 }
-
-/* button:focus {
-  outline: none;
-} */
 
 /* General Stylings */
 
@@ -171,6 +180,7 @@ input {
   padding-left: 8px;
   font-family: "Roboto";
   font-size: 10px;
+  background-color: #E7E7E7;
 }
 
 @keyframes App-logo-spin {
