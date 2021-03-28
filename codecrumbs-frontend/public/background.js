@@ -21,7 +21,9 @@ var latestLinks = ["", "", "", "", ""];
 
 chrome.tabs.onActivated.addListener((previousTabId, tabId, windowId) => {
     chrome.tabs.getSelected(null, (tab) => {
-        selectedTabUrl = tab.url
+        if (tab.url) {
+            selectedTabUrl = tab.url
+        }
         // alert(`selected ${selectedTabUrl}`)
     })
 })
@@ -35,12 +37,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
 
     // isTracking && currentURL !== undefined && currentURL.includes("http") && lastURL != currentURL && changeInfo.status === 'complete'
-
     var currentURL = tab.url
     // if (changeInfo.status === 'complete' && lastURL != currentURL && currentURL.includes("http") && currentURL !== undefined && isTracking) {
     //     alert(`TRACKING: ${isTracking}, CURURL: ${currentURL}, lastURL: ${lastURL}, STATUS: ${changeInfo.status}`)
     // }
     if (isTracking && currentURL !== undefined && currentURL.includes("http") && lastURL != currentURL && changeInfo.status === 'complete') {
+        selectedTabUrl = tab.url
+
         //add it to the database
         //only make API call if there is an associated Project
         //ADD IF STATEMENT CHECK WITH CURRENTTRACK
@@ -72,8 +75,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const dict = latestLinks[index];
 
             // alert(`Selected URL: ${selectedTabUrl}`)
-            // alert(`DICT ${dict[selectedTabUrl]}`)
-            // alert(`DICT ${dict[currentURL]}`)
+            // alert(`DICT select ${dict[selectedTabUrl]}`)
+            // alert(`DICT curr ${dict[currentURL]}`)
 
             if(dict[selectedTabUrl]) {
                 currentTabId = dict[selectedTabUrl]
@@ -105,7 +108,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // API CALLS - going to seperate in due time
 
 function logSearch(projectName, userId, websiteName, websiteUrl, faviconUrl) {
-    alert(`Logging: ${projectName}, ${userId}, ${websiteName}, ${websiteUrl}`)
+    // alert(`Logging: ${projectName}, ${userId}, ${websiteName}, ${websiteUrl}`)
 
     let body = {
         associatedProjectName: projectName,
@@ -142,7 +145,7 @@ function logSearch(projectName, userId, websiteName, websiteUrl, faviconUrl) {
 }
 
 function logComment(comment, latestSearchId) {
-    alert(`Logging Comment: ${comment} for ${latestSearchId}`)
+    // alert(`Logging Comment: ${comment} for ${latestSearchId}`)
     let body = {
         "associatedSearchId": latestSearchId,
         "content": comment,
