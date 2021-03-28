@@ -62,6 +62,7 @@ const SignIn = () => {
                         placeholder="E.g: joebruin1919@gmail.com"
                         id="userEmail"
                         onChange={(event) => onChangeHandler(event)}
+                        style={{width: '331px'}}
                     />
                     <label htmlFor="userPassword" className="block overline" style={{marginTop: '16px', marginBottom: '4px', float: 'left'}}>
                         Password:
@@ -74,6 +75,7 @@ const SignIn = () => {
                         placeholder="Your Password"
                         id="userPassword"
                         onChange={(event) => onChangeHandler(event)}
+                        style={{width: '331px'}}
                     />
                     <div className="trackerButton">
                         <button className="bg-green-400 hover:bg-green-500 w-full py-2 text-white onboardButtonOutlined" style={{marginRight: '8px'}} onClick={() => { signInWithGoogle() }}>

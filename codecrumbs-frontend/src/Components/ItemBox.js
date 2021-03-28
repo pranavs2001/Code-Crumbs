@@ -15,8 +15,11 @@ export default class ItemBox extends Component {
         super(props)
         this.state = {
             newCommentValue: '',
-            isHovering: false
+            isHovering: false,
+            nlp: undefined
         }
+
+        this.fetchnlp(props.fullUrl)
 
         this.handleChange = this.handleChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -31,11 +34,45 @@ export default class ItemBox extends Component {
         event.preventDefault()
     }
 
+    fetchnlp(url) {
+        const body = {
+            websiteUrl: url
+        }
+
+        fetch('https://codecrumbs.uc.r.appspot.com/buzzwords', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+        .then( res => res.json())
+        .then( data => this.setState({nlp: data}))
+    }
+
     render() {
 
         let comment;
+        let nlp
         var className = `itemBox ${this.props.isCurrent ? 'current ' : ''}`
         var marginStyle
+
+        console.log(nlp)
+
+        if(this.state.nlp) {
+            nlp = 
+            <div style={{display: 'flex', flexDirection: 'row', verticalAlign: 'center', marginTop: '4px'}}>
+                {this.state.nlp.map(item => {
+                    if (!item.includes(' ')) {
+                        console.log(`Item ${item} does not include ' '`)
+                        return <p className="pill">{item}</p> 
+                    } else {
+                        console.log(`item ${item} has space`)
+                        return null
+                    }
+                })}
+            </div>
+        }
 
         if (this.props.comment && !this.props.isCurrent) {
             comment = <p className="commentBox">{this.props.comment}</p>
@@ -77,6 +114,7 @@ export default class ItemBox extends Component {
                         </div> 
                     : ''}
                 </div>
+                {nlp}
                 {comment}
             </div>
         )

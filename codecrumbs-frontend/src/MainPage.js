@@ -95,7 +95,7 @@ export default function MainPage () {
 
         console.log(searches)
         if(searches) {
-            bottomContent = searches.map(search => <div id={search.websiteUrl}><ItemBox title={search.websiteUrl ? search.websiteUrl.substring(0, 45).concat('...') : ''} imageUrl={search.imageUrl}/></div>)
+            bottomContent = searches.map(search => <div id={search.websiteUrl}><ItemBox fullUrl={search.websiteUrl} title={search.websiteUrl ? search.websiteUrl.substring(0, 45).concat('...') : ''} imageUrl={search.imageUrl}/></div>)
         } else {
             bottomContent = <div style={{width: '352px'}}>No content yet...</div>
             bottomContent = <div style={{width: '352px'}}>{currentTrack ? "Fetching recent tracks" : "Select project to see tracking history"}</div>

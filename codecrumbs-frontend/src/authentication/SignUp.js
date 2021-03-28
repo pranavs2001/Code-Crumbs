@@ -66,6 +66,7 @@ const SignUp = () => {
                         placeholder="E.g: joebruin1919"
                         id="displayName"
                         onChange={event => onChangeHandler(event)}
+                        style={{width: '331px'}}
                     />
                     <label htmlFor="userEmail" className="block overline" style={{marginTop: '16px', marginBottom: '4px', float: 'left'}}>
                         Email:
@@ -78,6 +79,7 @@ const SignUp = () => {
                         placeholder="E.g: joebruin1919@gmail.com"
                         id="userEmail"
                         onChange={event => onChangeHandler(event)}
+                        style={{width: '331px'}}
                     />
                     <label htmlFor="userPassword" className="block overline" style={{marginTop: '16px', marginBottom: '4px', float: 'left'}}>
                         Password:
@@ -90,6 +92,7 @@ const SignUp = () => {
                         placeholder="Your Password"
                         id="userPassword"
                         onChange={event => onChangeHandler(event)}
+                        style={{width: '331px'}}
                     />
                     <div className="trackerButton">
                         <button

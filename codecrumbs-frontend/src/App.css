@@ -125,6 +125,13 @@
   background-color: #FFFFFF;
 }
 
+.pill {
+  background-color: #FFFFFF;
+  padding: 4px;
+  margin-right: 8px;
+  border-radius: 6px;
+}
+
 button {
   border: none;
   border-radius: 6px;
